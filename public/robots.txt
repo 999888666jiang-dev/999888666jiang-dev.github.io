@@ -1,0 +1,4 @@
+# robots.txt（ASCII 注释，避免编码歧义）
+# Preview build: block all crawlers until launch confirmation (§9.2).
+User-agent: *
+Disallow: /

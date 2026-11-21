@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0a0b0c">
+  <meta name="description" content="姜睿（JIANG RUI）· 软件工程 2027 届 · 深圳。约 1.5 年 Coze / Dify 实践：智能体与工作流、Prompt 调试、效果验证；方向大模型应用开发 / Agent 工作流。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="姜睿 · 大模型应用开发 / Agent 工作流">
+  <meta property="og:description" content="姜睿（JIANG RUI）· 软件工程 2027 届 · 深圳。约 1.5 年 Coze / Dify 实践：智能体与工作流、Prompt 调试、效果验证；方向大模型应用开发 / Agent 工作流。">
+  <meta property="og:url" content="https://999888666jiang-dev.github.io/">
+  <meta property="og:image" content="https://999888666jiang-dev.github.io/media/poster.jpg">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>姜睿 · 大模型应用开发 / Agent 工作流</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body>
+  <a class="skip" href="#about">跳到主内容</a>
+
+  <!-- 图层 1：舞台（hero 只被滚动擦洗，不播放） -->
+  <div class="stage" data-stage>
+    <video class="stage__media" data-hero
+      src="/media/hero.mp4" poster="/media/poster.jpg" width="1920" height="1080"
+      muted playsinline preload="none" disablepictureinpicture disableremoteplayback
+      aria-hidden="true"></video>
+  </div>
+
+  <!-- 图层 2：对角线 reveal（分屏打开后播放并循环） -->
+  <div class="reveal" data-reveal-box aria-hidden="true">
+    <video class="reveal__video" data-reveal
+      src="/media/reveal.mp4" width="1920" height="1080" muted loop playsinline preload="none" aria-hidden="true"></video>
+    <div class="reveal__dip" aria-hidden="true"></div>
+  </div>
+  <div class="scrim" aria-hidden="true"></div>
+
+  <!-- 图层 3：文字层 -->
+  <main class="frame" id="top">
+    <h1 class="brand" data-brand aria-label="姜睿 · 大模型应用开发 / Agent 工作流">
+      <span class="brand__slot">
+        <span class="brand__line" data-role="main" data-brand-line="main">JIANG</span>
+        <span class="brand__line" data-role="alt" data-brand-line="alt" aria-hidden="true">AI AGENT</span>
+        <span class="brand__line" data-role="crew" data-brand-line="crew" aria-hidden="true">SOFTWARE</span>
+      </span>
+      <span class="brand__slot">
+        <span class="brand__line" data-role="main" data-brand-line="main">RUI</span>
+        <span class="brand__line" data-role="alt" data-brand-line="alt" aria-hidden="true">WORKFLOW</span>
+        <span class="brand__line" data-role="crew" data-brand-line="crew" aria-hidden="true">2027</span>
+      </span>
+      <span class="brand__cap" aria-hidden="true">
+        <span data-cap="0">软件工程 2027 届 · 深圳 · 约 1.5 年 Coze / Dify 实践</span>
+        <span data-cap="1">PORTFOLIO 2026</span>
+      </span>
+    </h1>
+
+    <div class="chrome">
+      <div class="clock micro">
+        <time class="clock__time" data-clock>[ 00:00 ]</time>
+        <span class="clock__zone" data-clock-zone>ASIA<br>SHANGHAI</span>
+      </div>
+      <!-- M4：React GooeyNav 挂到 #nav-mount；无 JS 时保留普通 <a> 导航 -->
+      <div class="nav-slot" data-nav-slot>
+        <nav class="nav-fallback micro" aria-label="主导航" data-nav-fallback data-island="gooey-nav" data-island-state="static">
+          <a href="#top">首页</a><a href="#about">关于</a><a href="#projects">作品</a><a href="#contact">联系</a>
+        </nav>
+        <div id="nav-mount" class="nav-mount"></div>
+      </div>
+    </div>
+
+    <!-- M5 §5.1：Lanyard 层覆盖整块 hero（桌面 46vw×100vh，手机 100vw×100vh；overflow visible，不裁切甩动） -->
+    <div class="lanyard-layer" data-lanyard-layer data-island="lanyard" data-island-state="static" aria-hidden="true">
+      <div class="lanyard-3d" data-lanyard-3d></div>
+      <div class="lanyard-css-strap" aria-hidden="true"></div>
+      <div class="lanyard-clamp" aria-hidden="true"></div>
+      <div class="lanyard-card">
+        <img class="lanyard-card__face" src="/media/lanyard/front.jpg" alt="" width="960" height="1280" loading="lazy" decoding="async">
+      </div>
+      <div class="lanyard-hit" data-lanyard-hit></div>
+    </div>
+
+    <p class="lede" data-lede></p>
+
+    <div class="foot micro">
+      <span data-foot="0">©2026</span>
+      <span data-foot="1">SCROLL</span>
+    </div>
+  </main>
+
+  <!-- 章节 2（叙事层，不再占用文档 id） -->
+  <section class="sec2" aria-label="方向陈述">
+    <h2 class="s2-statement" data-statement></h2>
+  </section>
+
+  <!-- 章节 3（叙事层，不再占用文档 id） -->
+  <section class="sec3" aria-label="补充说明">
+    <p class="s3-note s3-note--left" style="--i:0" data-note="0"></p>
+    <p class="s3-note s3-note--right" style="--i:1" data-note="1"></p>
+    <p class="s3-bottom" data-closing></p>
+  </section>
+
+  <!-- 滚动跑道（唯一在流内元素；M6 之后接正常文档流内容区） -->
+  <div class="runway" data-runway="1" aria-hidden="true"></div>
+  <div class="runway-2" data-runway="2" aria-hidden="true"></div>
+  <div class="runway-3" data-runway="3" aria-hidden="true"></div>
+
+  <!-- M6.1 / X-05：电影感三章之后的正常文档流内容区（区块独立、数据驱动） -->
+  <div class="content-flow" data-content-flow>
+    <section class="doc-section" id="about" aria-labelledby="about-title">
+      <p class="doc-kicker">ABOUT</p>
+      <h2 class="doc-title" id="about-title">关于</h2>
+      <p class="doc-lede" data-about-summary></p>
+      <ul class="skill-grid" data-skills aria-label="技能"></ul>
+      <noscript>
+        <p class="noscript-note">无 JavaScript 静态摘要：软件工程 2027 届 · 深圳 · 约 1.5 年 Coze / Dify 实践；方向大模型应用开发 / Agent 工作流。</p>
+      </noscript>
+    </section>
+
+    <section class="doc-section" id="experience" aria-labelledby="experience-title">
+      <p class="doc-kicker">EXPERIENCE</p>
+      <h2 class="doc-title" id="experience-title">经历</h2>
+      <div class="exp-list" data-experience></div>
+      <div class="exp-secondary" data-campus></div>
+      <p class="edu-line" data-education></p>
+      <noscript>
+        <ul class="noscript-list">
+          <li>酣睡博士（深圳）科技有限公司 · 测试开发工程师（实习）· 2024.07—2024.09</li>
+          <li>广州极飞科技股份有限公司 · 无人机实验员（实习）· 2026.06—2026.08</li>
+        </ul>
+      </noscript>
+    </section>
+
+    <section class="doc-section" id="projects" aria-labelledby="projects-title" data-island="gallery" data-island-state="grid">
+      <p class="doc-kicker">PROJECTS</p>
+      <h2 class="doc-title" id="projects-title">作品</h2>
+      <div class="project-grid" data-projects></div>
+      <!-- M6.2：CircularGallery 轮播（懒加载；默认由静态网格兜底） -->
+      <div class="projects-stage" data-projects-stage hidden>
+        <div class="projects-gallery" data-gallery-mount></div>
+        <p class="projects-selected micro" data-gallery-selected aria-live="polite"></p>
+      </div>
+      <p class="nda-note" data-nda></p>
+      <noscript>
+        <p class="noscript-note">无 JavaScript 静态摘要（6 条公开作品）：</p>
+        <ul class="noscript-list">
+          <li>AI Flight Lab 个人网站 · 在线演示 · Vue 3 / TypeScript / Three.js</li>
+          <li>观象 · 大六壬 · 在线演示 · TypeScript / React</li>
+          <li>全职法师 · 阅读站 · 在线演示 · JavaScript / React</li>
+          <li>云烟 FPV · 飞控日志分析 · 实验 · React 19 / ECharts</li>
+          <li>铁饭碗 · 国家公职岗位查询 · 本地 · HTML / CSS / JS</li>
+          <li>源 · 蛊王源 2 代 — 设计复盘 · 复盘 · Electron / DSH 插件</li>
+        </ul>
+      </noscript>
+    </section>
+
+    <section class="doc-section" id="honors" aria-labelledby="honors-title">
+      <p class="doc-kicker">HONORS</p>
+      <h2 class="doc-title" id="honors-title">荣誉 / 证书</h2>
+      <ul class="honor-list" data-honors></ul>
+      <ul class="cert-list" data-certificates></ul>
+      <noscript>
+        <ul class="noscript-list">
+          <li>第十四届“挑战杯”广东大学生创业计划竞赛 省级银奖（团队）</li>
+          <li>“她轻创”综合奖省级银奖（团队）</li>
+          <li>中国国际大学生创新大赛（2024）校内赛 金奖、优胜奖（团队）</li>
+          <li>CAAC 多旋翼教员 / 中型超视距多旋翼机长 / 中型超视距直升机机长</li>
+        </ul>
+      </noscript>
+    </section>
+
+    <section class="doc-section" id="contact" aria-labelledby="contact-title">
+      <p class="doc-kicker">CONTACT</p>
+      <h2 class="doc-title" id="contact-title">联系</h2>
+      <p class="doc-lede" data-contact-note></p>
+      <div class="contact-links">
+        <a class="contact-link" data-contact-email href="#">邮箱</a>
+        <a class="contact-link" data-contact-github href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <noscript>
+        <p class="noscript-note">
+          无 JavaScript 静态摘要：邮箱 <a href="mailto:3164175833@qq.com">3164175833@qq.com</a> ·
+          GitHub <a href="https://github.com/999888666jiang-dev">999888666jiang-dev</a>
+        </p>
+      </noscript>
+    </section>
+
+    <footer class="doc-foot micro">
+      <span>©2026 姜睿</span>
+      <span>大模型应用开发 / Agent 工作流</span>
+    </footer>
+  </div>
+
+  <!-- M5.5：无 JS 时的竖屏提示横幅（不锁滚动、不可关闭、横屏隐藏） -->
+  <div class="orientation-banner" role="note">建议横屏浏览：这个页面按横屏构图，把手机横过来效果更好。</div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

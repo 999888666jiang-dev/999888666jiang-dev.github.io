@@ -1,0 +1,29 @@
+# 依赖与产物
+node_modules/
+dist/
+.npm-cache/
+
+# 原始素材：4K 原片与参考文档不入库（R-05 / §9.1）
+视频/
+网站主体.md
+页面切换栏.md
+首页右侧个人形象.md
+个人网站制作提示词.md
+作品展示.md
+作品卡片点击选中后展示形式.md
+
+# 内部协作与验收证据：不入公开仓库
+AGENTS.md
+docs/verification/
+docs/verification.md
+
+# 本地临时
+.env
+.env.*
+*.log
+.chrome-profile/
+.tmp/
+
+# 测试报告
+test-results/
+playwright-report/
