@@ -1587,6 +1587,7 @@ html.detail-bg-on .detail-petals { opacity: 1; }
   --color-ink: #f4f6f7; --color-muted: #b9c1c8; --color-subtle: #8f9ba3; --color-hairline: rgba(255,255,255,.12);
   --color-primary: #e8ecef; --color-on-primary: #0a0b0c;
   --color-success: #7ed6a5; --color-warning: #e8c07a; --color-danger: #e88a8a; --color-info: #8fb6dc;
+  /* Type scale lock (prompt-pack v5.2): 118 -> hero-display; 68 -> display; 40/38/34 -> title; 26 -> title min; 24/22 -> heading; 16/14/12 unchanged; mono is font family only. */
   --fs-hero-display: clamp(42px, 8.2vw, 160px); --fs-display: clamp(34px, 5.6vw, 68px); --fs-title: clamp(26px, 3.6vw, 40px);
   --fs-heading: clamp(20px, 1.8vw, 24px); --fs-body: 16px; --fs-body-sm: 14px; --fs-caption: 12px;
   --space-0: 0; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;

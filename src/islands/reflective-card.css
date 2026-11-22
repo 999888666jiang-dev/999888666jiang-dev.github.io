@@ -55,7 +55,7 @@
 .reflective-card__badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: calc(var(--space-1) + var(--space-1) * 0.5);
   color: var(--rc-ink);
   font-weight: 500;
 }

@@ -1,6 +1,6 @@
 ---
 version: "1.0"
-status: "m11.1d"
+status: "m11.1e"
 updated: "2026-11-23"
 owner: "姜睿 / yunyanfpv.cn"
 principle: "深色产品 + 电影感 signature；单 UI 强调色；不新增字体/依赖"
@@ -218,6 +218,8 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
   - **残留（转 M11.2/P2）**：字号 computed 仍有 9–10 档；islands CSS 未 token 化；M10D scrim/交互态描边按裁定保留（§2）；z-index 规格冲突（§5，需裁定）；非 4 倍数间距（6/10/14/18/20/22/26/28px）未收敛。
 - **M11.1d（B 批次，v5.2 终版规格，2026-11-23）**：7 角色字号（hero-display/display/title/heading/body/body-sm/caption，1440≈118/68/40/24/16/14/12）；颜色/间距/圆角/z-index/motion 全量 token（裸值 0）；灰阶 4 档；技能卡 4/2/1 等高、padding 24；AA 复测通过（1440 正文 p95 ≥6.71、375 ≥5.43；大字 ≥15.57；focus ring 12.2）；**移动视频保留 hero+reveal**：375 首屏 ≤2 条 mp4 合计 ≤7.0MB、无其他 mp4，reduced/无 JS 用 poster；详情区按 M10E 断点。
   - 实测：375 首屏仅 hero 1 条（传输 5.79MB ≤7.0MB），叙事滚动后追加 reveal（累计 2 条 9.12MB）；无其他 mp4；reduced/no-JS 0 条。
+- **M11.1e（7 角色锁定映射收尾，2026-11-23）**：字号与提示词助手锁定表逐项对齐（见 §3）：`--fs-hero-display/display/title/heading/body/body-sm/caption`；118→hero-display、68→display、40/38/34→title、26→title min、24/22→heading；mono 仅字体家族（无第 8 档）。375/1440 computed 去重均 **7**（`[12,14,16,20,26,34,42]` / `[12,14,16,24,40,68,118.08]`），无 <12px，正文 16/1.7。islands（gooey-nav/lanyard/circular-gallery/reflective-card）颜色/圆角/间距已 token 化，仅替换原值（`reflective-card` badge 6px gap 用 calc 精确保留 6px）。
+  - **待裁定**：z-index 统一（0/10/100/500/1000 会翻转花瓣/文字层级；当前实现为等值层序 token，未做五档统一）；非 4 倍数间距（6/10/14/18/20/22/26/28）——当前 v5.2 已按"最近 4 步 token"落值，若裁定要回退原值可回退。
 - **M11.2 P1**：技能 4 卡（已 4/2/1 等高，余：2×2 与 4 列的二选一定稿）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数（已达成）、内容 1200/阅读 720、hover 120ms + -1px、四态。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
 - **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55；**375 首屏 ≤2 条 mp4（hero+reveal）合计 ≤7.0MB、无其他 mp4**；0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；7 角色 token（375/1440 computed 去重 ≤7、无 11px）；技能卡不落单；详情四路径 + 键盘回归；`noindex` 保持。
