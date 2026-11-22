@@ -77,6 +77,7 @@ let keydown = null;
 let savedScrollY = 0;
 let lastTrigger = null;
 let wasOpen = false;
+let historyPushed = false;
 
 function buildOverlay() {
   overlay = document.createElement('div');
@@ -90,9 +91,13 @@ function buildOverlay() {
       <div class="detail-host"></div>
     </div>`;
   document.body.append(overlay);
-  overlay.querySelector('.detail-close').addEventListener('click', close);
+  overlay.querySelector('.detail-close').addEventListener('click', () => close());
   overlay.addEventListener('click', (event) => {
     if (event.target === overlay) close();
+  });
+  // 浏览器返回键：详情打开时返回 = 关闭详情并停在原位置，不离开站点
+  addEventListener('popstate', () => {
+    if (wasOpen) close({ fromHistory: true });
   });
   return overlay;
 }
@@ -106,7 +111,15 @@ function lockScroll() {
 function unlockScroll() {
   document.documentElement.classList.remove('detail-lock');
   document.body.style.overflow = '';
-  window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  const y = savedScrollY;
+  window.scrollTo({ top: y, behavior: 'instant' });
+  // 焦点归还/浏览器恢复可能在下一帧改变滚动位置，再断言一次
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: y, behavior: 'instant' });
+  });
+  setTimeout(() => {
+    if (Math.abs(window.scrollY - y) > 2) window.scrollTo({ top: y, behavior: 'instant' });
+  }, 80);
 }
 
 function trapFocus(event) {
@@ -130,7 +143,7 @@ function trapFocus(event) {
   }
 }
 
-function close() {
+function close({ fromHistory = false } = {}) {
   if (!overlay || !wasOpen) return;
   wasOpen = false;
   overlay.hidden = true;
@@ -139,6 +152,13 @@ function close() {
   document.removeEventListener('keydown', trapFocus, true);
   unlockScroll();
   dispatchEvent(new CustomEvent('gallery:resume'));
+  // 清理为详情打开而压入的历史条目（不改变当前页面位置）
+  if (historyPushed) {
+    historyPushed = false;
+    if (!fromHistory) {
+      try { history.back(); } catch { /* noop */ }
+    }
+  }
   const canFocus = (el) => {
     if (!el || !document.contains(el)) return false;
     if (el.getClientRects().length === 0) return false; // 被隐藏的触发元素不夺焦
@@ -247,6 +267,12 @@ export function openProjectDetail(slugOrIndex, { trigger = null } = {}) {
   overlay.hidden = false;
   wasOpen = true;
   document.addEventListener('keydown', trapFocus, true);
+  if (!historyPushed) {
+    try {
+      history.pushState({ dshDetail: project.slug ?? 'detail' }, '', location.href);
+      historyPushed = true;
+    } catch { /* 某些环境禁止 pushState，忽略 */ }
+  }
   requestAnimationFrame(() => overlay.querySelector('.detail-close')?.focus());
   return true;
 }
