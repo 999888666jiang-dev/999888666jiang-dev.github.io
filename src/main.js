@@ -449,3 +449,53 @@ if (content.islands?.lanyard !== false && canUseLanyard) {
     io.observe(el);
   });
 })();
+/* M8.4 详情区 Bloom 背景：进入 #about 前 300px 才加载；离开详情区暂停；移动/coarse/reduced 只用 poster */
+function initDetailBg() {
+  const layer = $('[data-detail-bg]');
+  const video = $('[data-detail-bg-video]');
+  if (!layer || !video) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 899px)').matches;
+  const canVideo = !reduced && !coarse;
+  const sections = ['about', 'experience', 'projects', 'honors', 'contact']
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+  let srcSet = false;
+  const loadVideo = () => {
+    if (!canVideo || srcSet) return;
+    srcSet = true;
+    video.src = '/media/detail/bloom-loop.mp4';
+    video.play().catch(() => { /* 自动播放被拒保留 poster */ });
+  };
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const on = sections.some((section) => {
+      const rect = section.getBoundingClientRect();
+      return rect.bottom > 0 && rect.top < innerHeight;
+    });
+    document.documentElement.classList.toggle('detail-bg-on', on);
+    if (on) {
+      loadVideo();
+      if (video.paused && srcSet) video.play().catch(() => {});
+    } else if (!video.paused) {
+      video.pause();
+    }
+  };
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  };
+  update();
+  addEventListener('scroll', requestUpdate, { passive: true });
+  addEventListener('resize', requestUpdate);
+  // 进入 #about 前 300px 预加载（首屏不请求）
+  const about = document.getElementById('about');
+  if (about && canVideo && 'IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) loadVideo();
+    }, { rootMargin: '300px 0px' }).observe(about);
+  }
+}
+initDetailBg();

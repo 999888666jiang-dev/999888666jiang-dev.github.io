@@ -107,3 +107,10 @@
   | 812×375 | 300 | **1.20** | 216 |
 - 说明：**1.30/1.20/1.15 只是本组件当前系数下的锁值，不是规格默认值**；若组件升级改变卡高公式，需重新反推并更新本节与 verification §8.17。
 - 其余 props 不变：itemAspect 1.2、gap 0.16、fadeEdges 0.10、bend 0.8、autoScroll 0.15（reduced=0）、背景透明。
+## M8.4 详情区 Bloom 背景素材授权（2026-11-22）
+
+- 素材：public/media/detail/bloom-loop.mp4（1280×720、8s、24fps、无音轨、faststart）、loom-poster.jpg（1600 宽）。
+- 来源：用户提供并明确授权用于本站；**仅求职简历用途、不商用**。
+- 范围例外：背景层只允许出现在 #about → #contact 内容区；hero 电影感三章绝不出现。
+- 降级：移动/coarse/reduced 只用 poster（不请求 mp4）；无 JS 用 CSS background-image poster。
+- 数值：opacity .38、filter saturate(.75) brightness(.72)、scrim gba(5,7,8,.84/.62 45%/.86)；tokens 集中在 --detail-bg-*。

@@ -1327,3 +1327,82 @@ body::after {
   .contact-cta { align-self: flex-end; }
 }
 @media (prefers-reduced-motion: reduce) { .contact-cta { transition: none; } }
+
+/* ================= M8.4 详情区 Bloom 背景层（tokens，仅内容区） ================= */
+:root {
+  --doc-bg-opacity: 0.42;
+  --doc-bg-filter: saturate(0.85) contrast(1.02) brightness(0.7);
+  --doc-bg-fade: 280ms;
+  --doc-bg-poster: url('/media/detail/bloom-poster.jpg');
+  --doc-bg-scrim-top: rgba(6, 7, 8, 0.92);
+  --doc-bg-scrim-mid: rgba(6, 7, 8, 0.62);
+  --doc-bg-scrim-bottom: rgba(6, 7, 8, 0.95);
+  --doc-bg-scrim-left: rgba(6, 7, 8, 0.75);
+}
+.doc-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--doc-bg-fade) ease;
+  background: var(--doc-bg-poster) center / cover no-repeat;
+}
+html.doc-bg-on .doc-bg { opacity: 1; }
+.doc-bg__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: var(--doc-bg-opacity);
+  filter: var(--doc-bg-filter);
+}
+.doc-bg__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--doc-bg-scrim-left), transparent 55%),
+    linear-gradient(180deg, var(--doc-bg-scrim-top), rgba(6, 7, 8, 0.5) 28%, var(--doc-bg-scrim-mid) 72%, var(--doc-bg-scrim-bottom));
+}
+.content-flow { background: transparent; }
+@media (max-width: 899px) { .doc-bg__video { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .doc-bg { transition: none; }
+  .doc-bg__video { display: none; }
+}
+/* ================= M8.4 详情区 Bloom 背景（仅 #about→#contact；hero 不出现） ================= */
+:root {
+  --detail-bg-opacity: 0.38;
+  --detail-bg-filter: saturate(0.75) brightness(0.72);
+  --detail-bg-fade: 280ms;
+  --detail-bg-poster: url('/media/detail/bloom-poster.jpg');
+  --detail-bg-scrim: linear-gradient(180deg, rgba(5, 7, 8, 0.84), rgba(5, 7, 8, 0.62) 45%, rgba(5, 7, 8, 0.86));
+}
+.detail-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--detail-bg-fade) ease;
+  background: var(--detail-bg-poster) center / cover no-repeat;
+}
+html.detail-bg-on .detail-bg { opacity: 1; }
+.detail-bg__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: var(--detail-bg-opacity);
+  filter: var(--detail-bg-filter);
+}
+.detail-bg__scrim { position: absolute; inset: 0; background: var(--detail-bg-scrim); }
+.content-flow { background: transparent; }
+@media (max-width: 899px), (pointer: coarse) { .detail-bg__video { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .detail-bg { transition: none; }
+  .detail-bg__video { display: none; }
+}

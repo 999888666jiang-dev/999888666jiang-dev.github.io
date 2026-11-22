@@ -37,3 +37,5 @@
 - 公开托管前需用户逐项确认版权与署名（R-23 / §11.3 gate）；拿不准先不公开。
 
 | Instrument Serif（Regular/Italic woff2） | google/fonts 仓库 / fontsource | M8.1 章节大标题（自托管） | SIL Open Font License 1.1 — 见 public/fonts/InstrumentSerif-OFL.txt | 不 preload、不请求 Google Fonts；中文标题走系统衬线栈 |
+
+| Bloom 花中人像背景视频/海报 | 用户提供的 public/media/detail/bloom-loop.mp4（1280×720/8s/无音轨）与 loom-poster.jpg | M8.4 详情区背景（#about→#contact） | 用户授权素材，仅用于个人求职简历展示、不商用 | 仅站内使用；hero/三章不出现；移动/reduced/无 JS 只用 poster |
