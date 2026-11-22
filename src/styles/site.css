@@ -1553,3 +1553,21 @@ html.cards-js .exp-list, html.cards-visible .exp-list { display: grid !important
 html.exp-reveal .exp-secondary,
 html.exp-reveal [data-campus],
 html.exp-reveal [data-education] { display: none !important; }
+
+/* M10 花瓣拼合层：视频之上、内容之下；移动/reduced/no-JS 不画 */
+.detail-petals { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 280ms ease; }
+html.detail-bg-on .detail-petals { opacity: 1; }
+@media (max-width: 899px), (pointer: coarse), (prefers-reduced-motion: reduce) { .detail-petals { display: none; } }
+/* M10 提亮：详情 video .9 / brightness 1.02；scrim 减弱（正文对比度 ≥4.5） */
+.detail-bg__video { opacity: 0.9; filter: saturate(0.95) brightness(1.02); }
+.detail-bg__scrim { background: linear-gradient(180deg, rgba(5,7,8,.55), rgba(5,7,8,.45) 45%, rgba(5,7,8,.6)); }
+/* 主页电影感三章视频提亮 + scrim 减一档 */
+.stage__media, .reveal__video, .stage video, .reveal video { filter: brightness(1.10) saturate(0.98) contrast(1.02); }
+.stage .scrim, .reveal .scrim { opacity: 0.88; }
+
+/* M10 花瓣层在内容之下 */
+.content-flow { position: relative; z-index: 2; }
+.detail-petals { z-index: 1; }
+
+/* M10B 背景中心径向 scrim：遮住视频里原有的花，避免两朵 */
+.detail-bg__scrim { background: radial-gradient(circle at 52.5% 46.7%, rgba(5,7,8,.86) 0 22%, rgba(5,7,8,.58) 34%, transparent 52%), linear-gradient(180deg, rgba(5,7,8,.55), rgba(5,7,8,.45) 45%, rgba(5,7,8,.6)); }
