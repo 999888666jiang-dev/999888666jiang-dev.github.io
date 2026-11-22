@@ -593,6 +593,13 @@ initExpCards();
 function initM9Outro() {
   const about = document.getElementById('about');
   const contact = document.getElementById('contact');
+  // M11.1b：字号变化后 about 位置改变，强制在 about 进入视口前退出三章固定层
+  const syncPast = () => {
+    if (!about) return;
+    const top = about.getBoundingClientRect().top;
+    if (top < innerHeight * 0.85) document.documentElement.classList.add('past-narrative');
+    else if (scrollY < about.getBoundingClientRect().top + scrollY - innerHeight) document.documentElement.classList.remove('past-narrative');
+  };
   if (about) {
     let ticking = false;
     const fadeAbout = () => {
@@ -603,9 +610,9 @@ function initM9Outro() {
       about.style.opacity = String(fade);
     };
     const req = () => { if (!ticking) { ticking = true; requestAnimationFrame(fadeAbout); } };
-    addEventListener('scroll', req, { passive: true });
-    addEventListener('resize', req);
-    fadeAbout();
+    addEventListener('scroll', () => { syncPast(); req(); }, { passive: true });
+    addEventListener('resize', () => { syncPast(); req(); });
+    syncPast(); fadeAbout();
   }
   if (contact && 'IntersectionObserver' in window) {
     contact.classList.add('sec-io');
