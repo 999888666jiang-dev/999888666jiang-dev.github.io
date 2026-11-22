@@ -68,7 +68,9 @@ export const siteContent = {
   contact: {
     email: '3164175833@qq.com',
     github: 'https://github.com/999888666jiang-dev',
-    note: '实习 / 校招机会欢迎邮件联系。'
+    note: '实习 / 校招机会欢迎邮件联系。',
+    mission: '如果你也在把 AI 实验变成可上线的产品，欢迎邮件聊聊。',
+    pills: ['实习 / 校招', 'Agent 工作流', 'Vue 3 / 前端', '深圳']
   },
 
   about: {

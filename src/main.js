@@ -259,6 +259,12 @@ function renderHonors() {
 function renderContact() {
   const note = $('[data-contact-note]');
   if (note) note.textContent = content.contact?.note ?? '';
+  const mission = $('[data-contact-mission]');
+  if (mission) mission.textContent = content.contact?.mission ?? '';
+  const pills = $('[data-contact-pills]');
+  if (pills) for (const pill of content.contact?.pills ?? []) pills.append(make('li', null, pill));
+  const cta = $('[data-contact-cta]');
+  if (cta && content.contact?.email) cta.href = `mailto:${content.contact.email}`;
   const email = $('[data-contact-email]');
   if (email && content.contact?.email) {
     email.href = `mailto:${content.contact.email}`;
