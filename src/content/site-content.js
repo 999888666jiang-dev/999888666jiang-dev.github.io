@@ -34,15 +34,7 @@ export const siteContent = {
 
   // P0：区块独立配置（缺省值在 main.js 合并；老数据不填也能渲染）
   sections: {
-    act: {
-    kicker: 'BLOOM · OPENING',
-    items: [
-      '把 AI 实验做成能上线的作品。',
-      'Agent 工作流 · Prompt 调试 · Dify 本地化部署',
-      '软件工程 2027 届 · 深圳 · 求职中'
-    ]
-  },
-  about: { enabled: true, order: 10 },
+    about: { enabled: true, order: 10 },
     experience: { enabled: true, order: 20 },
     projects: { enabled: true, order: 30 },
     honors: { enabled: true, order: 40 },
@@ -81,14 +73,6 @@ export const siteContent = {
     pills: ['实习 / 校招', 'Agent 工作流', 'Vue 3 / 前端', '深圳']
   },
 
-  act: {
-    kicker: 'BLOOM · OPENING',
-    items: [
-      '把 AI 实验做成能上线的作品。',
-      'Agent 工作流 · Prompt 调试 · Dify 本地化部署',
-      '软件工程 2027 届 · 深圳 · 求职中'
-    ]
-  },
   about: {
     summary: '广州新华学院软件工程本科（2023—2027，2027 届），方向大模型应用开发 / Agent 工作流：约 1.5 年 Coze 智能体与工作流实践，做过 Dify 本地化部署、Vibe Coding 上线网站与用户反馈整理。',
     mission: '把 AI 实验做成能上线的应用，让工作流可复核、可维护。',

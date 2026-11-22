@@ -282,13 +282,6 @@ function apply() {
   const aboutTop = contentOffset('#about');
   const pastNarrative = aboutTop != null && y >= aboutTop - innerHeight * 0.45;
   root.classList.toggle('past-narrative', pastNarrative);
-  // M8.5：开场幕内隐藏三章固定层（避免叠在 Bloom 视频上）
-  const actEl = document.getElementById('act');
-  if (actEl) {
-    const actRect = actEl.getBoundingClientRect();
-    const inAct = actRect.top < innerHeight * 0.5 && actRect.bottom > innerHeight * 0.5;
-    root.classList.toggle('in-act', inAct);
-  }
 
   root.style.setProperty('--shrink', (1 - (1 - shrinkEnd) * norm(p, CONFIG.shrink)).toFixed(4));
   root.style.setProperty('--exit', norm(p, CONFIG.dissolve).toFixed(4));

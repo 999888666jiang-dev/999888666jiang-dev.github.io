@@ -114,12 +114,3 @@
 - 范围例外：背景层只允许出现在 #about → #contact 内容区；hero 电影感三章绝不出现。
 - 降级：移动/coarse/reduced 只用 poster（不请求 mp4）；无 JS 用 CSS background-image poster。
 - 数值：opacity .38、filter saturate(.75) brightness(.72)、scrim gba(5,7,8,.84/.62 45%/.86)；tokens 集中在 --detail-bg-*。
-
-## M8.5 Bloom 开场幕（2026-11-22）
-
-- 位置：电影感三章之后、#about 之前；500vh sticky 100vh stage；仅此一段，hero/内容区不动。
-- 播放：滚动擦洗（rAF + passive scroll），phase = p<=1/3?1:p<=2/3?2:3；当前视频 currentTime=localP*duration；切段 CSS opacity 200ms 交叉、无黑屏；不自动播放。
-- 懒加载：首屏 0 mp4；进场前 600px 只预载 v1；v2/v3 phase 前 300px 加载；离开开场幕全部 pause。
-- 叠层治理：html.in-act 时隐藏三章固定层（stage/reveal/sec2/sec3/brand/lede/foot/clock/lanyard），只留 Bloom 背景+当前文案+编号；切出后 past-narrative + M8.4 详情背景接管，无闪回。
-- 降级：≤899px / reduced / 无 JS → 三屏 poster + 文案，不请求 mp4、不擦洗。
-- 素材授权：用户提供，仅求职简历用途、不商用。
