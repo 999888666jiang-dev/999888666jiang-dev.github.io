@@ -234,6 +234,11 @@ function renderProjects() {
     const detailBtn = make('button', 'project-card__detail', '详情');
     detailBtn.type = 'button';
     detailBtn.setAttribute('aria-label', `查看 ${project.title ?? '作品'} 详情`);
+    detailBtn.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      detailBtn.click();
+    });
     detailBtn.addEventListener('click', () => {
       import('./islands/reflective-card-mount.jsx')
         .then(({ openProjectDetail }) => openProjectDetail(project.slug, { trigger: detailBtn }))
