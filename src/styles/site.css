@@ -1538,3 +1538,13 @@ html.cards-visible .sec3 { display: none !important; }
 
 /* M9 cards 与列表交接：卡片可见期间列表必须隐藏，避免同屏/跳变 */
 html.cards-visible .exp-list { display: none !important; }
+
+/* M9 静态三卡：experience 内 3 列 grid + IO reveal（只动 opacity/transform） */
+.exp-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px); align-items: stretch; }
+.exp-card { background: rgba(8,9,10,.9); border: 1px solid rgba(255,255,255,.14); border-radius: 16px; padding: clamp(18px, 2vw, 26px); }
+html.exp-reveal .exp-card { opacity: 0; transform: translateY(14px); transition: opacity 520ms ease, transform 520ms ease; }
+html.exp-reveal .exp-card.is-inview { opacity: 1; transform: none; }
+html.cards-js .exp-list, html.cards-visible .exp-list { display: grid !important; }
+@media (max-width: 899px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .exp-list { grid-template-columns: 1fr; }
+}

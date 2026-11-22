@@ -549,79 +549,46 @@ function initDetailScene() {
 }
 initDetailScene();
 /* M9 fixed cards：内容来自 site-content.experience，滚动 fadeIn/fadeOut，移动/无 JS 回退原列表 */
-function initFixedCards() {
-  const trigger = $('[data-cards-trigger]');
-  const layer = $('[data-fixed-cards]');
-  if (!trigger || !layer) return;
-  const about = document.querySelector('#about');
-  if (about && trigger && trigger.previousElementSibling !== about) { about.insertAdjacentElement('afterend', trigger); }
-  console.log('cards-order', trigger.offsetTop, about.offsetTop, about.compareDocumentPosition(trigger));
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const coarse = matchMedia('(pointer: coarse)').matches || innerWidth < 900;
-  if (reduced || coarse) return;
-  const jobs = content.experience ?? [];
-  for (const job of jobs) {
+/* M9 静态三卡：复用经验数据，普通 grid + IO reveal（无 JS 时正常文档流可见） */
+function initExpCards() {
+  const list = document.querySelector('[data-experience]');
+  if (!list) return;
+  if (!list.querySelector('.exp-card--campus') && (content.campus ?? []).length) {
     const card = document.createElement('article');
-    card.className = 'fixed-cards__card';
+    card.className = 'exp-card exp-card--campus';
     const head = document.createElement('div');
-    head.className = 'fixed-cards__head';
+    head.className = 'exp-card__head';
     const h3 = document.createElement('h3');
-    h3.className = 'fixed-cards__company';
-    h3.textContent = job.company ?? '';
+    h3.className = 'exp-card__company';
+    h3.textContent = '校园与教育';
     const period = document.createElement('span');
-    period.className = 'fixed-cards__period';
-    period.textContent = job.period ?? '';
+    period.className = 'exp-card__period';
+    period.textContent = content.education?.period ?? '2023—2027';
     head.append(h3, period);
     const role = document.createElement('p');
-    role.className = 'fixed-cards__role';
-    role.textContent = job.role ?? '';
+    role.className = 'exp-card__role';
+    role.textContent = [content.education?.school, content.education?.major].filter(Boolean).join(' · ');
     const ul = document.createElement('ul');
-    ul.className = 'fixed-cards__list';
-    for (const line of job.highlights ?? []) {
+    ul.className = 'exp-card__list';
+    for (const item of content.campus) {
       const li = document.createElement('li');
-      li.textContent = line;
+      li.textContent = [item.title, item.detail].filter(Boolean).join('：');
       ul.append(li);
     }
     card.append(head, role, ul);
-    layer.append(card);
+    list.append(card);
   }
-  // 第 3 张：校园 + 教育（数据来自 content.campus / education）
-  const campusJob = { company: '校园与教育', period: content.education?.period ?? '2023—2027', role: [content.education?.school, content.education?.major].filter(Boolean).join(' · '), highlights: (content.campus ?? []).map((item) => [item.title, item.detail].filter(Boolean).join('：')) };
-  if (campusJob.highlights.length) {
-    const card = document.createElement('article');
-    card.className = 'fixed-cards__card';
-    const head = document.createElement('div'); head.className = 'fixed-cards__head';
-    const h3 = document.createElement('h3'); h3.className = 'fixed-cards__company'; h3.textContent = campusJob.company;
-    const period = document.createElement('span'); period.className = 'fixed-cards__period'; period.textContent = campusJob.period;
-    head.append(h3, period);
-    const role = document.createElement('p'); role.className = 'fixed-cards__role'; role.textContent = campusJob.role;
-    const ul = document.createElement('ul'); ul.className = 'fixed-cards__list';
-    for (const line of campusJob.highlights) { const li = document.createElement('li'); li.textContent = line; ul.append(li); }
-    card.append(head, role, ul); layer.append(card);
+  document.documentElement.classList.add('exp-reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) entry.target.classList.toggle('is-inview', entry.isIntersecting);
+    }, { threshold: 0.12 });
+    for (const card of list.querySelectorAll('.exp-card')) io.observe(card);
+  } else {
+    for (const card of list.querySelectorAll('.exp-card')) card.classList.add('is-inview');
   }
-  layer.dataset.count = String(layer.children.length);
-  document.documentElement.classList.add('cards-js');
-  let ticking = false;
-  const update = () => {
-    ticking = false;
-    const rect = trigger.getBoundingClientRect();
-    const top = rect.top + scrollY;
-    const vh = innerHeight;
-    const start = top - vh * 0.5;
-    const end = top + rect.height - vh * 0.3;
-    const fadeIn = Math.min(1, Math.max(0, (scrollY - (start - vh * 0.2)) / (vh * 0.2)));
-    const fadeOut = Math.min(1, Math.max(0, (end + vh * 0.3 - scrollY) / (vh * 0.3)));
-    const opacity = Math.min(fadeIn, fadeOut);
-    layer.style.opacity = String(opacity);
-    layer.style.pointerEvents = opacity > 0.1 ? 'auto' : 'none';
-    document.documentElement.classList.toggle('cards-visible', opacity > 0.05);
-  };
-  const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-  addEventListener('scroll', request, { passive: true });
-  addEventListener('resize', request);
-  update();
 }
-initFixedCards();
+initExpCards();
 /* M9 收尾：hero 只淡出 #about；section-three IO 加 visible；只动 opacity/transform */
 function initM9Outro() {
   const about = document.getElementById('about');
