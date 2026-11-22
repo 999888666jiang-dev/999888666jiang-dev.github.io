@@ -1101,6 +1101,7 @@ html.past-narrative .nav-slot {
   --glass-border: rgba(255, 255, 255, 0.12);
   --rule: rgba(255, 255, 255, 0.14);
   --noise-opacity: 0.025;
+  --text-kicker: #9aa5ad;
 }
 @font-face {
   font-family: 'Instrument Serif';
@@ -1127,7 +1128,7 @@ html.past-narrative .nav-slot {
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #8f9ba3;
+  color: var(--text-kicker);
 }
 .doc-kicker::before { content: counter(bloom-section, decimal-leading-zero); color: #dfe6ea; }
 .doc-kicker::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--rule); }
