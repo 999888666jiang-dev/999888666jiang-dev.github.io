@@ -658,7 +658,7 @@ function initDetailPetals() {
         angle: (a1 + a2) / 2,
         scatter: { x: (Math.random() - 0.5) * 2.4, y: (Math.random() - 0.5) * 2.4, rot: (Math.random() - 0.5) * 2.2 },
         seed: Math.random(),
-        alpha: 0.82 + Math.random() * 0.12
+        alpha: 0.92 + Math.random() * 0.06
       });
     }
   };
@@ -682,10 +682,21 @@ function initDetailPetals() {
     scale = (TARGET / CROP.w) * dpr;
     detailStart = about.getBoundingClientRect().top + scrollY;
   };
+  const drawCropBlend = () => {
+    if (!assembled) return;
+    const a = Math.min(0.15, Math.max(0, (q - 0.84) / 0.16 * 0.15));
+    if (a <= 0) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = a;
+    ctx.translate(cx, cy); ctx.scale(scale, scale);
+    ctx.drawImage(assembled, -CROP.w / 2, -CROP.h / 2);
+    ctx.restore();
+  };
   const drawSettled = () => {
     if (!assembled) return;
-    const breathe = q > 0.90 ? 1 + Math.sin(performance.now() / 1600) * 0.01 : 1;
-    const rotB = q > 0.90 ? Math.sin(performance.now() / 1600) * 0.004 : 0;
+    const breathe = q > 0.94 ? 1 + Math.sin(performance.now() / 1600) * 0.01 : 1;
+    const rotB = q > 0.94 ? Math.sin(performance.now() / 1600) * 0.004 : 0;
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     ctx.translate(cx, cy); ctx.rotate(rotB); ctx.scale(breathe, breathe);
@@ -698,13 +709,13 @@ function initDetailPetals() {
     if (!active || !fragments.length) return;
     if (now - last < 33) { raf = requestAnimationFrame(draw); return; }
     last = now;
-    if (q >= 0.55 && q < 0.90 && Math.abs(q - lastQ) < 0.0005) { raf = requestAnimationFrame(draw); return; }
+    if (q >= 0.84 && q < 0.94 && Math.abs(q - lastQ) < 0.0005) { raf = requestAnimationFrame(draw); return; }
     lastQ = q;
     const breathe = q > 0.90 ? 1 + Math.sin(now / 1600) * 0.01 : 1;
     const rotB = q > 0.90 ? Math.sin(now / 1600) * 0.004 : 0;
-    const glow = clamp01((q - 0.75) / 0.15);
+    const glow = clamp01((q - 0.84) / 0.10);
     ctx.clearRect(0, 0, w, h);
-    if (q >= 0.55) { drawSettled(); raf = requestAnimationFrame(draw); return; }
+    if (q >= 0.70) { drawSettled(); drawCropBlend(); raf = requestAnimationFrame(draw); return; }
     if (now - last < 100) { raf = requestAnimationFrame(draw); return; }
     ensureFlight();
     const fx = 720 / innerWidth;
@@ -715,8 +726,8 @@ function initDetailPetals() {
     for (let i = 0; i < N; i++) {
       const frag = fragments[i];
       const meta = fragSectors[i];
-      const start = 0.06 + meta.seed * 0.16;
-      const t = easeOut(clamp01((q - start) / (0.55 - start)));
+      const start = 0.06 + meta.seed * 0.35;
+      const t = easeOut(clamp01((q - start) / 0.28));
       const sx = meta.scatter.x * 420 * dpr;
       const sy = meta.scatter.y * 420 * dpr;
       const x = cx + sx * (1 - t);
@@ -749,7 +760,7 @@ function initDetailPetals() {
   const onScroll = () => {
     measure();
     if (!built && scrollY + innerHeight >= detailStart - 600) { built = true; makeFragments(); buildAssembled(); }
-    q = clamp01((scrollY - detailStart) / (innerHeight * 0.9));
+    q = clamp01((scrollY - detailStart) / (innerHeight * 2.2));
     const on = scrollY + innerHeight >= detailStart;
     if (on && !active) { active = true; if (!raf) raf = requestAnimationFrame(draw); }
     if (!on && active) { active = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } ctx.clearRect(0, 0, w, h); }
