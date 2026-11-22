@@ -712,7 +712,7 @@ function initDetailPetals() {
     scale = (TARGET / CROP.w) * dpr;
     detailStart = about.getBoundingClientRect().top + scrollY;
   };
-  // v5.5 flight alpha: t=0 -> .22, t>=.9 -> .90, landed -> meta.alpha (.92-.96)
+  // v5.6 lifecycle: fade 1.0 -> 1.12, clear at >= 1.12; flight alpha below t=0 -> .22, t>=.9 -> .90, landed -> meta.alpha (.92-.96)
   const flightAlpha = (t, meta) => {
     if (t >= 0.9) return 0.90 + (meta.alpha - 0.90) * clamp01((t - 0.9) / 0.1);
     return 0.22 + (0.90 - 0.22) * (t / 0.9);
@@ -732,7 +732,7 @@ function initDetailPetals() {
   const draw = (now) => {
     raf = 0;
     if (!active || !fragments.length) return;
-    if (qRaw >= 1.3) { ctx.clearRect(0, 0, w, h); return; }
+    if (qRaw >= 1.12) { ctx.clearRect(0, 0, w, h); return; }
     if (now - last < 33) { raf = requestAnimationFrame(draw); return; }
     last = now;
     if (qRaw >= 0.84 && qRaw < 0.94 && Math.abs(qRaw - lastQ) < 0.0005) { raf = requestAnimationFrame(draw); return; }
@@ -804,9 +804,9 @@ function initDetailPetals() {
     if (!built && scrollY + innerHeight >= detailStart - 600) { built = true; makeFragments(); buildAssembled(); }
     qRaw = detailStart ? (scrollY - detailStart) / (innerHeight * 2.2) : 0;
     q = clamp01(qRaw);
-    fadeOut = 1 - smoothstep(1.0, 1.3, qRaw);
+    fadeOut = 1 - smoothstep(1.0, 1.12, qRaw);
     flowerAlpha = FLOWER_MAX_ALPHA * fadeOut;
-    if (qRaw >= 1.3) {
+    if (qRaw >= 1.12) {
       if (raf) { cancelAnimationFrame(raf); raf = 0; }
       active = false;
       lastQ = -1;
