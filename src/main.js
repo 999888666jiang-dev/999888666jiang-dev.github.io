@@ -670,6 +670,14 @@ function initDetailPetals() {
     assembled.width = CROP.w; assembled.height = CROP.h;
     const g = assembled.getContext('2d');
     for (const frag of fragments) g.drawImage(frag, 0, 0, CROP.w, CROP.h);
+    // 抠黑：把 crop 黑底转为透明，避免 assembled 在 screen 下露出矩形边界
+    const id = g.getImageData(0, 0, CROP.w, CROP.h);
+    const d = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const lum = Math.max(d[i], d[i + 1], d[i + 2]);
+      d[i + 3] = Math.min(255, Math.round(lum * 1.25));
+    }
+    g.putImageData(id, 0, 0);
   };
   const ensureFlight = () => {
     if (!flightBuf) { flightBuf = document.createElement('canvas'); flightBuf.width = 720; flightBuf.height = 450; }
@@ -716,7 +724,8 @@ function initDetailPetals() {
     const glow = clamp01((q - 0.84) / 0.10);
     ctx.clearRect(0, 0, w, h);
     if (q >= 0.70) { drawSettled(); drawCropBlend(); raf = requestAnimationFrame(draw); return; }
-    if (now - last < 100) { raf = requestAnimationFrame(draw); return; }
+    if (now - lastFlight < 100) { raf = requestAnimationFrame(draw); return; }
+    lastFlight = now;
     ensureFlight();
     const fx = 720 / innerWidth;
     const fc = flightBuf.getContext('2d');
