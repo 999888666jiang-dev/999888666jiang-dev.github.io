@@ -518,6 +518,7 @@ function initDetailScene() {
   const startParticles = () => { if (pctx && !partRaf) { lastP = 0; partRaf = requestAnimationFrame(particleTick); } };
   const stopParticles = () => { if (partRaf) { cancelAnimationFrame(partRaf); partRaf = 0; } if (pctx) pctx.clearRect(0, 0, pCanvas.width, pCanvas.height); };
   const load = () => {
+    if (reduced || coarse) return;
     if (started) return;
     started = true;
     video.src = '/media/detail/veldara-loop.mp4';
