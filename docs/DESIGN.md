@@ -24,13 +24,13 @@ colors:
   danger: "#e88a8a"
   info: "#8fb6dc"
 typography:
-  hero-display: { size: "clamp(44px, 7vw, 96px)", line: "1.04", tracking: "-0.01em", weight: "400" }
-  section: { size: "clamp(34px, 4.6vw, 64px)", line: "1.08", tracking: "0", weight: "400" }
-  heading: { size: "clamp(22px, 2vw, 30px)", line: "1.2", tracking: "0", weight: "500" }
+  hero-display: { size: "clamp(42px, 8.2vw, 160px)", line: "1.04", tracking: "-0.01em", weight: "400" }
+  display: { size: "clamp(34px, 5.6vw, 68px)", line: "1.08", tracking: "0", weight: "400" }
+  title: { size: "clamp(26px, 3.6vw, 40px)", line: "1.1", tracking: "0", weight: "400" }
+  heading: { size: "clamp(20px, 1.8vw, 24px)", line: "1.2", tracking: "0", weight: "500" }
   body: { size: "16px", line: "1.7", tracking: "0", weight: "400" }
   body-sm: { size: "14px", line: "1.6", tracking: "0", weight: "400" }
   caption: { size: "12px", line: "1.5", tracking: "0.02em", weight: "400" }
-  mono: { size: "12px", line: "1.5", tracking: "0.08em", weight: "400" }
 space: { "0": "0", "1": "4px", "2": "8px", "3": "12px", "4": "16px", "5": "24px", "6": "32px", "7": "48px", "8": "64px", "9": "96px" }
 radius: { sm: "8px", md: "12px", lg: "16px", pill: "999px" }
 z-index:
@@ -82,7 +82,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **字体**：不新增外部字体/CDN；自托管 Instrument Serif + Inter，中文回退 Noto Serif SC / PingFang SC / 微软雅黑；中文标题不做负字距，全大写拉丁 +0.08em。
 - **可读性优先**：正文 ≥4.5:1、大字/UI ≥3:1、focus ring ≥3:1，按最亮帧实测；不达标先加局部卡底/局部 scrim，不整页压暗。
 - **动效**：只动 `opacity`/`transform`；reduced-motion 全静态；单主 rAF，30fps 节流；离屏 cancel。
-- **边界**：不改轮播/详情/Lanyard/滚动叙事/粒子/花瓣交互；详情区首屏 0 条 `veldara-loop.mp4`（hero/reveal 主叙事视频按 R-04 加载，375 也属于叙事的一部分）、FPS≥55、CLS≤0.1；`noindex` 保持到用户确认发布。
+- **边界**：不改轮播/详情/Lanyard/滚动叙事/粒子/花瓣交互；**移动视频保留 hero+reveal，不 poster-only、不压缩**；375 首屏 ≤2 条 mp4（hero+reveal）合计 ≤7.0MB、无其他 mp4，reduced/无 JS 用 poster；详情区背景仍按 M10E 断点（≤600 poster / 601–899 lite / ≥900 full），不混主页预算；FPS≥55、CLS≤0.1；`noindex` 保持到用户确认发布。
 
 ## 2. Colors · 颜色
 
@@ -117,15 +117,15 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 
 ## 3. Typography · 字体 7 级
 
-| 级别 | 字号 | 行高 | 字距 | 用途 |
-| --- | --- | --- | --- | --- |
-| hero-display | clamp(44px, 7vw, 96px) | 1.04 | -0.01em | 首屏品牌字/章节大标题（拉丁） |
-| section | clamp(34px, 4.6vw, 64px) | 1.08 | 0 | 章节标题（关于/经历/作品/荣誉/联系） |
-| heading | clamp(22px, 2vw, 30px) | 1.2 | 0 | 卡片标题、公司名 |
-| body | 16px | 1.7 | 0 | 正文/说明（**M11.1 P0 落地点**） |
-| body-sm | 14px | 1.6 | 0 | 次要说明、卡片要点 |
-| caption | 12px | 1.5 | 0.02em | 元信息、日期、脚注 |
-| mono | 12px | 1.5 | 0.08em | 编号、kicker、技术栈（全大写时 +0.08em） |
+| 角色 | 字号 | 行高 | 字距 | 用途 | 1440 / 375 实测 |
+| --- | --- | --- | --- | --- | --- |
+| hero-display | clamp(42px, 8.2vw, 160px) | 1.04 | -0.01em | 首屏品牌字（拉丁） | 118.08 / 42 |
+| display | clamp(34px, 5.6vw, 68px) | 1.08 | 0 | 章节标题、三章陈述句 | 68 / 34 |
+| title | clamp(26px, 3.6vw, 40px) | 1.1 | 0 | mission/contact 陈述、大标题变体 | 40 / 26 |
+| heading | clamp(20px, 1.8vw, 24px) | 1.2 | 0 | 卡片标题、公司名、弹层标题 | 24 / 20 |
+| body | 16px | 1.7 | 0 | 正文/说明 | 16 / 16 |
+| body-sm | 14px | 1.6 | 0 | 次要说明、tagline、卡片要点 | 14 / 14 |
+| caption | 12px | 1.5 | 0.02em | 元信息、日期、脚注、mono 小标 | 12 / 12 |
 
 **规则**
 
@@ -133,9 +133,10 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 中文标题不做负字距（`-0.01em` 只给拉丁 hero-display）；
 - 字体栈加 `system-ui` 兜底；不新增字体文件/依赖。
 - 大字数重量：标题 400（Instrument Serif）/500（Inter），正文 400；不合成粗体。
-- **落地（M11.1d）**：字号硬收敛 7 档——所有 `font-size` 声明只允许 `var(--fs-hero|section|heading|body|body-sm|caption|mono)`；clamp 的 min/max 只属于对应级别的边界。grep 实测：声明档数 **7**，任意视口 computed 档数 ≤6（caption/mono 同为 12px）。
-- **原值映射**：118/96→hero；68/60/56/44→section；40/38/30/26/24/22→heading；16→body；15/14/13→body-sm；12→caption 或 mono。旧 token `--fs-display / --fs-statement / --fs-cap / --fs-micro / --fs-lede / --display-xl` 已删除。
-- 移动端回落：`.brand__cap` ≤767 → caption；`.lede` 与 narrative `.s3-note` ≤767 → body（保持移动可读性）。
+- **落地（M11.1d / v5.2）**：字号硬收敛 **7 角色**——所有 `font-size` 声明只允许 `var(--fs-hero-display|display|title|heading|body|body-sm|caption)`；clamp 的 min/max 已归入角色边界；**mono 只作为字体家族**（`--font-mono`），不再有第 8 个字号档。grep 实测：声明档数 **7**；375 与 1440 computed 去重均 **7**（`[12,14,16,20,26,34,42]` / `[12,14,16,24,40,68,118.08]`），无 11px。
+- **原值映射（v5.2）**：118→hero-display；68→display；40/38/34→title；26→title min；24/22→heading；16/14/12 不变。旧 token `--fs-display/--fs-statement/--fs-cap/--fs-micro/--fs-lede/--display-xl/--fs-mono` 已删除。
+- **motion token**：过渡/动画时长只用 `--dur-fast 120ms / --dur-base 180ms / --dur-slow 240ms / --dur-slower 320ms`（28 处裸时长已映射；仅 0ms 保留）；缓动 `cubic-bezier(.16,1,.3,1)` → `var(--ease-expo)`。
+- 移动端回落：`.brand__cap` ≤767 → caption；`.lede` 与 narrative `.s3-note` ≤767 → body（中文正文 16/1.7 保持）。
 
 ## 4. Layout · 布局与间距
 
@@ -143,7 +144,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 间距只取 4 的倍数：`0/4/8/12/16/24/32/48/64/96`（token `space.0–9`）；M11.1d 起 `margin/padding/gap` 的 px 字面量已全部换 token（2/3/6/7/9/10/11/14/18/20/22/26/28/40 → 最近 token，如 18→16、22/26/28→24、10/14→12、6/7/9→8、2/3→4、20→16、40→32）；仅相对单位（em/vh/%）与负偏移保留。
 - 章节结构：kicker（mono）→ 标题（section）→ 内容；章节间距 ≥64px。
 - 卡片网格：桌面 3 列（≥1200 允许 4 列/2×2 视内容），768 2×2，移动 1 列；**等高**。
-- 技能卡（M11.1c）：≥1200 **4 列**、641–1199 2 列、≤640 1 列；`grid-auto-rows:1fr` 保证等高，1440 不再 3+1 落单。
+- 技能卡（M11.1d/v5.2）：≥1200 **4 列**、768 2×2、≤640 1 列；`grid-auto-rows:1fr` 保证等高，卡内 padding **24px**（`--space-5`）；1440 不再单卡落单。
 - 固定/粘性层不占内容高度；`position:fixed` 层必须 `pointer-events:none`（交互层单独设）。
 - 详情页背景层不参与布局；花瓣/粒子层永远在文字之下（z 见第 6 章）。
 
@@ -203,7 +204,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 | ≥1280 | 内容 1200，3–4 列 | 完整动效/轮播/花瓣 |
 | 900–1279 | 内容 100% 96vw，2–3 列 | 完整动效 |
 | 768–899 | 2×2 卡 | 简化动效；花瓣/视频按既有规则 |
-| ≤767 | 1 列，内边距 20–24 | 详情区只 poster + 静态内容；hero/reveal 主叙事视频照常加载（叙事一部分） |
+| ≤767 | 1 列，内边距 20–24 | 详情区按 M10E 断点；hero/reveal 主叙事视频保留（不 poster-only、不压缩），reduced/无 JS 用 poster |
 
 - `pointer:coarse` 与 `prefers-reduced-motion: reduce` 视为降级：不初始化 canvas/video 动画，只保留 poster + 静态五段。
 - 无 JS：noscript 兜底 poster + 文案，500vh 类滚动区收起为普通高度，不制造空白滚动。
@@ -215,7 +216,8 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **M11.1 P0**：字号收敛 7 级（正文 16/1.7、无 <12px、中文无负字距、system-ui）、`:focus-visible` 2px+offset2、颜色/间距/圆角/z-index 走 token、灰阶收敛 4 档、文字列局部底 AA；清理 `index.html` 字面量 `\n`；OG/canonical 改 `https://yunyanfpv.cn/`。
   - **进度（2026-11-23，M11.1c）**：site.css 颜色/间距/圆角 token 化（98/54/27 处）；灰阶收敛 4 档；字号下限 12px、正文 16/1.7、中文 tracking ≥ -0.01em；`:focus-visible` 2px+2px；AA 复测 p95：正文 ≥6.74、大字 ≥5.93（品牌字 p95）、hero caption 4.28→5.39（局部暗光晕，不改布局/不整页压暗）、focus ring 11.76；技能 4 卡 4/2/1 列等高；`index.html` 字面量 `\n` 清理、canonical/og 统一 yunyanfpv.cn（含运行时 `site-content.js`，修 main.js 覆盖回 github.io）；修复 `lastFlight` 未声明导致 strict-mode ReferenceError（M10 遗留）。
   - **残留（转 M11.2/P2）**：字号 computed 仍有 9–10 档；islands CSS 未 token 化；M10D scrim/交互态描边按裁定保留（§2）；z-index 规格冲突（§5，需裁定）；非 4 倍数间距（6/10/14/18/20/22/26/28px）未收敛。
-- **M11.1d（B 批次，2026-11-23）**：字号硬收敛 7 档；颜色/间距/圆角/z-index 全量 token（裸值 0）；灰阶 4 档；AA 复测（正文 p95 ≥6.74、大字 ≥17.9、hero caption ≥10.98、focus ring 11.76）；技能 4 卡 4/2/1 列等高（保持）；**移动端视频保持现状**（≤600px 详情区 poster，hero/reveal 不改 poster-only）；DESIGN §10「首屏 0 mp4」按实际口径改写为详情区口径。
+- **M11.1d（B 批次，v5.2 终版规格，2026-11-23）**：7 角色字号（hero-display/display/title/heading/body/body-sm/caption，1440≈118/68/40/24/16/14/12）；颜色/间距/圆角/z-index/motion 全量 token（裸值 0）；灰阶 4 档；技能卡 4/2/1 等高、padding 24；AA 复测通过（1440 正文 p95 ≥6.71、375 ≥5.43；大字 ≥15.57；focus ring 12.2）；**移动视频保留 hero+reveal**：375 首屏 ≤2 条 mp4 合计 ≤7.0MB、无其他 mp4，reduced/无 JS 用 poster；详情区按 M10E 断点。
+  - 实测：375 首屏仅 hero 1 条（传输 5.79MB ≤7.0MB），叙事滚动后追加 reveal（累计 2 条 9.12MB）；无其他 mp4；reduced/no-JS 0 条。
 - **M11.2 P1**：技能 4 卡（已 4/2/1 等高，余：2×2 与 4 列的二选一定稿）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数（已达成）、内容 1200/阅读 720、hover 120ms + -1px、四态。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
-- **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55、详情区首屏 0 条 `veldara-loop.mp4`、0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；详情四路径 + 键盘回归；`noindex` 保持。
+- **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55；**375 首屏 ≤2 条 mp4（hero+reveal）合计 ≤7.0MB、无其他 mp4**；0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；7 角色 token（375/1440 computed 去重 ≤7、无 11px）；技能卡不落单；详情四路径 + 键盘回归；`noindex` 保持。
