@@ -1548,3 +1548,8 @@ html.cards-js .exp-list, html.cards-visible .exp-list { display: grid !important
 @media (max-width: 899px), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .exp-list { grid-template-columns: 1fr; }
 }
+
+/* M9 去重：JS 已把校园/教育渲染进第三张卡，隐藏文档流里的重复段（无 JS 时仍显示） */
+html.exp-reveal .exp-secondary,
+html.exp-reveal [data-campus],
+html.exp-reveal [data-education] { display: none !important; }
