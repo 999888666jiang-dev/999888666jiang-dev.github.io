@@ -35,3 +35,5 @@
 
 - 不允许运行时从 Google Fonts / jsDelivr / 其它 CDN 加载（R-08）；所有依赖本地安装并打包。
 - 公开托管前需用户逐项确认版权与署名（R-23 / §11.3 gate）；拿不准先不公开。
+
+| Instrument Serif（Regular/Italic woff2） | google/fonts 仓库 / fontsource | M8.1 章节大标题（自托管） | SIL Open Font License 1.1 — 见 public/fonts/InstrumentSerif-OFL.txt | 不 preload、不请求 Google Fonts；中文标题走系统衬线栈 |

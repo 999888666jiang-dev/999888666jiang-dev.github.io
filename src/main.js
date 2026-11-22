@@ -125,6 +125,10 @@ function sectionConfig() {
 function renderAbout() {
   const summary = $('[data-about-summary]');
   if (summary) summary.textContent = content.about?.summary ?? '';
+  const mission = $('[data-about-mission]');
+  if (mission) mission.textContent = content.about?.mission ?? '';
+  const pills = $('[data-about-pills]');
+  if (pills) for (const pill of content.about?.pills ?? []) pills.append(make('li', null, pill));
   const skills = $('[data-skills]');
   if (!skills) return;
   for (const skill of content.skills ?? []) {
@@ -416,3 +420,21 @@ if (content.islands?.lanyard !== false && canUseLanyard) {
   if ('requestIdleCallback' in window) requestIdleCallback(startLanyard, { timeout: 2200 });
   else setTimeout(startLanyard, 1400);
 }
+
+/* M8.1 Bloom：入场 reveal（只 transform/opacity；reduced 与无 JS 静态可见） */
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+  document.documentElement.classList.add('js-reveal');
+  const io = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('is-inview');
+      io.unobserve(entry.target);
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('#about .skill-card, #experience .exp-card, #about .about-pills li, .doc-kicker').forEach((el, i) => {
+    el.style.setProperty('--reveal-i', String(i % 6));
+    io.observe(el);
+  });
+})();

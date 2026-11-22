@@ -72,7 +72,9 @@ export const siteContent = {
   },
 
   about: {
-    summary: '广州新华学院软件工程本科（2023—2027，2027 届），方向大模型应用开发 / Agent 工作流：约 1.5 年 Coze 智能体与工作流实践，做过 Dify 本地化部署、Vibe Coding 上线网站与用户反馈整理。'
+    summary: '广州新华学院软件工程本科（2023—2027，2027 届），方向大模型应用开发 / Agent 工作流：约 1.5 年 Coze 智能体与工作流实践，做过 Dify 本地化部署、Vibe Coding 上线网站与用户反馈整理。',
+    mission: '把 AI 实验做成能上线的应用，让工作流可复核、可维护。',
+    pills: ['大模型应用开发', 'Agent 工作流', 'Coze / Dify', 'Vue 3 / 前端交付']
   },
 
   skills: [

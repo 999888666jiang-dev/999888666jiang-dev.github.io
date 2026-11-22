@@ -1090,3 +1090,127 @@ html.past-narrative .nav-slot {
 @media (prefers-reduced-motion: reduce) and (max-width: 767px) {
   html:not(.narrative) .lanyard-layer { display: none; }
 }
+
+/* ================= M8.1 Bloom 基础（仅 tokens/字体/章节头/about/experience） ================= */
+:root {
+  --font-display: 'Instrument Serif', 'Songti SC', 'STSong', 'Noto Serif SC', 'SimSun', serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Consolas', 'SFMono-Regular', monospace;
+  --display-xl: clamp(34px, 5.6vw, 68px);
+  --section-gap: clamp(56px, 9vh, 112px);
+  --glass-bg: rgba(255, 255, 255, 0.035);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --rule: rgba(255, 255, 255, 0.14);
+  --noise-opacity: 0.025;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('/fonts/InstrumentSerif-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+/* 章节头：mono 小标 + 衬线大标题 + 细线 + 01–05 编号（CSS counter，不硬编码） */
+.content-flow { counter-reset: bloom-section; }
+.doc-section { counter-increment: bloom-section; padding: var(--section-gap) 0; }
+.doc-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8f9ba3;
+}
+.doc-kicker::before { content: counter(bloom-section, decimal-leading-zero); color: #dfe6ea; }
+.doc-kicker::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--rule); }
+.doc-title {
+  margin: 10px 0 26px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--display-xl);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: #f2f5f7;
+}
+/* about：mission + pills + 紧凑 feature card ≤220px */
+.about-mission {
+  margin: 0 0 18px;
+  max-width: 24ch;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 40px);
+  line-height: 1.18;
+  color: #f2f5f7;
+  font-style: italic;
+}
+.about-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; padding: 0; }
+.about-pills li {
+  padding: 6px 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #cfd8dd;
+  background: var(--glass-bg);
+}
+#about .skill-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+#about .skill-card {
+  height: 100%;
+  max-height: 220px;
+  padding: 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+#about .skill-card:hover { border-color: rgba(255, 255, 255, 0.26); transform: translateY(-2px); }
+#about .skill-card__title { font-family: var(--font-display); font-size: 20px; }
+#about .skill-card__detail { font-size: 12.5px; }
+/* experience：玻璃行卡 + mono 日期，hover 只改边框/轻位移 */
+#experience .exp-list { display: grid; gap: 12px; }
+#experience .exp-card {
+  position: relative;
+  padding: 18px 20px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(6px);
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+#experience .exp-card:hover { border-color: rgba(255, 255, 255, 0.26); transform: translateY(-2px); }
+#experience .exp-card__period { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: #aeb8c0; }
+#experience .exp-card__company { font-family: var(--font-display); font-weight: 400; font-size: 24px; }
+#experience .exp-card__role { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.04em; color: #9ba6ad; }
+#experience .exp-card__list { color: #c6cfd5; }
+/* 入场：只 transform/opacity，无 JS 直接可见（js-reveal 才隐藏） */
+html.js-reveal :where(.doc-kicker, #about .skill-card, #experience .exp-card, .about-pills li) {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1), transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--reveal-i, 0) * 60ms);
+}
+html.js-reveal :where(.doc-kicker, #about .skill-card, #experience .exp-card, .about-pills li).is-inview { opacity: 1; transform: none; transition-delay: 0ms; }
+@media (prefers-reduced-motion: reduce) {
+  html.js-reveal :where(.doc-kicker, #about .skill-card, #experience .exp-card, .about-pills li) { opacity: 1; transform: none; transition: none; }
+  #about .skill-card:hover, #experience .exp-card:hover { transform: none; }
+}
+/* 噪点 ≤3% opacity，不遮内容 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.6'/></svg>");
+}
+@media (max-width: 899px) { #about .skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { #about .skill-grid { grid-template-columns: 1fr; } }
+@media (orientation: landscape) and (max-height: 500px) { :root { --display-xl: clamp(28px, 6vw, 48px); --section-gap: 48px; } }
