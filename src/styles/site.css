@@ -1214,3 +1214,73 @@ body::after {
 @media (max-width: 899px) { #about .skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { #about .skill-grid { grid-template-columns: 1fr; } }
 @media (orientation: landscape) and (max-height: 500px) { :root { --display-xl: clamp(28px, 6vw, 48px); --section-gap: 48px; } }
+
+/* ================= M8.2 projects / honors（只视觉，不动交互） ================= */
+#projects .project-grid,
+#projects .projects-stage {
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  padding: 8px;
+}
+#projects .project-grid { scrollbar-gutter: stable; }
+#projects .nda-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 8px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #aeb8c0;
+}
+#honors .honor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: honor;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+#honors .honor-list li {
+  counter-increment: honor;
+  position: relative;
+  min-height: 120px;
+  max-height: 220px;
+  padding: 18px 18px 16px 54px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(4px);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #c6cfd5;
+  transition: border-color 180ms ease;
+}
+#honors .honor-list li::before {
+  content: counter(honor, decimal-leading-zero);
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #8f9ba3;
+}
+#honors .honor-list li:hover { border-color: rgba(255, 255, 255, 0.28); }
+#honors .cert-list { margin-top: 16px; }
+@media (max-width: 899px) { #honors .honor-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  #honors .honor-list { grid-template-columns: 1fr; }
+  #honors .honor-list li { min-height: 0; }
+  #projects .project-grid, #projects .projects-stage { padding: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #honors .honor-list li { transition: none; }
+}

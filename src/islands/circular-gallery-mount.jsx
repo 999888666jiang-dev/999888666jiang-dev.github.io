@@ -27,7 +27,7 @@ export function buildGalleryItems() {
 
 function openDetail(slug, index, triggerOverride = null) {
   if (document.querySelector('.detail-modal:not([hidden])')) return; // opening guard：防双开
-  const trigger = triggerOverride ?? document.querySelectorAll('[data-gallery-list] button')[index] ?? document.querySelector('.circular-gallery');
+  const trigger = triggerOverride ?? document.querySelector('.circular-gallery');
   import('./reflective-card-mount.jsx')
     .then(({ openProjectDetail }) => openProjectDetail(slug, { trigger }))
     .catch((error) => console.warn('[detail] 详情卡加载失败', error));
