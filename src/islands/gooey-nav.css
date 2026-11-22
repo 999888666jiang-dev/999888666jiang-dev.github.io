@@ -1,8 +1,8 @@
 .gooey-nav {
-  --gn-pad: 6px;
+  --gn-pad: var(--space-2);
   --gn-gap: var(--space-1);
-  --gn-x: 16px;
-  --gn-y: 9px;
+  --gn-x: var(--space-4);
+  --gn-y: var(--space-2);
   position: relative;
   display: inline-flex;
   max-width: 100%;
@@ -11,17 +11,17 @@
 }
 
 .gooey-nav--sm {
-  --gn-pad: 5px;
-  --gn-gap: calc(var(--space-1) * 0.5);
-  --gn-x: 13px;
-  --gn-y: 7px;
+  --gn-pad: var(--space-1);
+  --gn-gap: var(--space-1);
+  --gn-x: var(--space-3);
+  --gn-y: var(--space-2);
 }
 
 .gooey-nav--lg {
-  --gn-pad: 7px;
-  --gn-gap: calc(var(--space-2) - var(--space-1) * 0.5);
-  --gn-x: 20px;
-  --gn-y: 11px;
+  --gn-pad: var(--space-2);
+  --gn-gap: var(--space-2);
+  --gn-x: var(--space-20);
+  --gn-y: var(--space-3);
 }
 
 .gooey-nav--framed {
