@@ -348,9 +348,19 @@ export function initNarrative({ statement, closing, onActive }) {
   addEventListener('scroll', apply, { passive: true });
   // 旋转/视口变化：记录归一化进度 → 重测 → 映射 scrollY → 更新变量与视频 seek（150ms 防抖）
   let rotateTimer = 0;
+  // M10F：关闭详情会触发 scrollbar/视口副作用，150ms 后这里的重算会把 scrollY 拉走
+  document.documentElement.classList && (window.__m10fPrevLock = document.documentElement.classList.contains('detail-lock'));
+  new MutationObserver(() => {
+    const locked = document.documentElement.classList.contains('detail-lock');
+    if (window.__m10fPrevLock && !locked) window.__detailCloseAt = Date.now();
+    window.__m10fPrevLock = locked;
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   const onViewportChange = () => {
     clearTimeout(rotateTimer);
     rotateTimer = setTimeout(() => {
+      if (Date.now() - (window.__detailCloseAt || 0) < 800) return;
+      if (document.documentElement.classList.contains('detail-lock')) return;
+      if (document.querySelector('.detail-modal:not([hidden])')) return;
       const progress = clamp01(scrollY / span);
       measure();
       window.scrollTo({ top: progress * span, behavior: 'instant' });
