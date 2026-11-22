@@ -616,7 +616,7 @@ function initM9Outro() {
   }
 }
 initM9Outro();
-/* M10B 真实碎片重组：poster 中央花切 28 扇区，q 滚动飞回拼成原图；背景径向 scrim 压暗原花 */
+/* M10G 花瓣收口：28 扇区预渲染羽化 + 飞行显隐 + qRaw 淡出/清空（v5.5） */
 function initDetailPetals() {
   const canvas = $('[data-detail-petals]');
   const about = document.getElementById('about');
@@ -629,18 +629,28 @@ function initDetailPetals() {
   const CROP = { x: 600, y: 180, w: 480, h: 480 };
   const N = 28;
   const TARGET = 440;
+  const OVERLAP = (1.75 * Math.PI) / 180; // v5.5: adjacent sector overlap 1.5-2deg
+  const FEATHER = 1.35; // v5.5: pre-render gaussian sigma 1.2-1.5px (never per-frame blur)
+  const FLOWER_MAX_ALPHA = 0.78;
   const fragments = [];
   const fragSectors = [];
   let img = null;
   let w = 0, h = 0, cx = 0, cy = 0, scale = 1;
-  let raf = 0, active = false, q = 0, last = 0, detailStart = 0;
+  let raf = 0, active = false, q = 0, qRaw = 0, fadeOut = 1, flowerAlpha = FLOWER_MAX_ALPHA, last = 0, detailStart = 0;
+  let assembled = null;
+  let flightBuf = null;
+  let lastQ = -1;
+  let lastFlight = 0;
+  let built = false;
   const clamp01 = (t) => Math.min(1, Math.max(0, t));
+  const smoothstep = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
   const makeFragments = () => {
     const S = CROP.w * dpr;
     for (let i = 0; i < N; i++) {
       const a1 = (i / N) * Math.PI * 2;
-      const a2 = ((i + 1) / N) * Math.PI * 2 + 0.012;
+      const a2 = ((i + 1) / N) * Math.PI * 2 + OVERLAP;
       const c = document.createElement('canvas');
       c.width = S; c.height = S;
       const g = c.getContext('2d');
@@ -652,26 +662,36 @@ function initDetailPetals() {
       g.clip();
       g.drawImage(img, -CROP.x * dpr, -CROP.y * dpr, img.naturalWidth * dpr, img.naturalHeight * dpr);
       g.restore();
+      // pre-rendered gaussian alpha feather (blurred sector mask, composited once)
+      const mask = document.createElement('canvas');
+      mask.width = S; mask.height = S;
+      const mg = mask.getContext('2d');
+      mg.filter = 'blur(' + (FEATHER * dpr) + 'px)';
+      mg.fillStyle = '#fff';
+      mg.beginPath();
+      mg.moveTo(S / 2, S / 2);
+      mg.arc(S / 2, S / 2, S * 0.72, a1, a2);
+      mg.closePath();
+      mg.fill();
+      g.save();
+      g.globalCompositeOperation = 'destination-in';
+      g.drawImage(mask, 0, 0);
+      g.restore();
       fragments.push(c);
       fragSectors.push({
         a1,
         angle: (a1 + a2) / 2,
         scatter: { x: (Math.random() - 0.5) * 2.4, y: (Math.random() - 0.5) * 2.4, rot: (Math.random() - 0.5) * 2.2 },
         seed: Math.random(),
-        alpha: 0.92 + Math.random() * 0.06
+        alpha: 0.92 + Math.random() * 0.04
       });
     }
   };
-  let assembled = null;
-  let flightBuf = null;
-  let lastQ = -1;
-  let lastFlight = 0;
   const buildAssembled = () => {
     assembled = document.createElement('canvas');
     assembled.width = CROP.w; assembled.height = CROP.h;
     const g = assembled.getContext('2d');
     for (const frag of fragments) g.drawImage(frag, 0, 0, CROP.w, CROP.h);
-    // 抠黑：把 crop 黑底转为透明，避免 assembled 在 screen 下露出矩形边界
     const id = g.getImageData(0, 0, CROP.w, CROP.h);
     const d = id.data;
     for (let i = 0; i < d.length; i += 4) {
@@ -691,9 +711,14 @@ function initDetailPetals() {
     scale = (TARGET / CROP.w) * dpr;
     detailStart = about.getBoundingClientRect().top + scrollY;
   };
+  // v5.5 flight alpha: t=0 -> .22, t>=.9 -> .90, landed -> meta.alpha (.92-.96)
+  const flightAlpha = (t, meta) => {
+    if (t >= 0.9) return 0.90 + (meta.alpha - 0.90) * clamp01((t - 0.9) / 0.1);
+    return 0.22 + (0.90 - 0.22) * (t / 0.9);
+  };
   const drawCropBlend = () => {
-    if (!assembled) return;
-    const a = Math.min(0.15, Math.max(0, (q - 0.84) / 0.16 * 0.15));
+    if (!assembled || flowerAlpha <= 0) return;
+    const a = Math.min(0.15, Math.max(0, (q - 0.84) / 0.16 * 0.15)) * flowerAlpha;
     if (a <= 0) return;
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
@@ -703,11 +728,12 @@ function initDetailPetals() {
     ctx.restore();
   };
   const drawSettled = () => {
-    if (!assembled) return;
+    if (!assembled || flowerAlpha <= 0) return;
     const breathe = q > 0.94 ? 1 + Math.sin(performance.now() / 1600) * 0.01 : 1;
     const rotB = q > 0.94 ? Math.sin(performance.now() / 1600) * 0.004 : 0;
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = flowerAlpha;
     ctx.translate(cx, cy); ctx.rotate(rotB); ctx.scale(breathe, breathe);
     ctx.scale(scale, scale);
     ctx.drawImage(assembled, -CROP.w / 2, -CROP.h / 2);
@@ -716,17 +742,19 @@ function initDetailPetals() {
   const draw = (now) => {
     raf = 0;
     if (!active || !fragments.length) return;
+    if (qRaw >= 1.3) { ctx.clearRect(0, 0, w, h); return; }
     if (now - last < 33) { raf = requestAnimationFrame(draw); return; }
     last = now;
-    if (q >= 0.84 && q < 0.94 && Math.abs(q - lastQ) < 0.0005) { raf = requestAnimationFrame(draw); return; }
-    lastQ = q;
+    if (qRaw >= 0.84 && qRaw < 0.94 && Math.abs(qRaw - lastQ) < 0.0005) { raf = requestAnimationFrame(draw); return; }
+    lastQ = qRaw;
+    // flight is throttled to 10fps: skip before clearing so a throttled frame never blanks the canvas
+    if (qRaw < 0.70 && now - lastFlight < 100) { raf = requestAnimationFrame(draw); return; }
+    if (qRaw < 0.70) lastFlight = now;
     const breathe = q > 0.90 ? 1 + Math.sin(now / 1600) * 0.01 : 1;
     const rotB = q > 0.90 ? Math.sin(now / 1600) * 0.004 : 0;
     const glow = clamp01((q - 0.84) / 0.10);
     ctx.clearRect(0, 0, w, h);
-    if (q >= 0.70) { drawSettled(); drawCropBlend(); raf = requestAnimationFrame(draw); return; }
-    if (now - lastFlight < 100) { raf = requestAnimationFrame(draw); return; }
-    lastFlight = now;
+    if (qRaw >= 0.70) { drawSettled(); drawCropBlend(); raf = requestAnimationFrame(draw); return; }
     ensureFlight();
     const fx = 720 / innerWidth;
     const fc = flightBuf.getContext('2d');
@@ -744,11 +772,26 @@ function initDetailPetals() {
       const y = cy + sy * (1 - t);
       const rot = meta.scatter.rot * (1 - t);
       const s = scale * fx * (1 + (meta.seed - 0.5) * 0.16 * (1 - t));
+      const intro = clamp01(q / 0.06);
+      // trailing echoes fade to 0.06 / 0.03 while airborne (v5.5)
+      if (t < 1) {
+        for (const [off, ta] of [[0.03, 0.06], [0.06, 0.03]]) {
+          const tx = cx + sx * (1 - t + off);
+          const ty = cy + sy * (1 - t + off);
+          fc.save();
+          fc.translate(tx * fx, ty * fx);
+          fc.rotate(rot);
+          fc.scale(s, s);
+          fc.globalAlpha = flowerAlpha * ta * intro;
+          fc.drawImage(frag, -CROP.w / 2, -CROP.h / 2);
+          fc.restore();
+        }
+      }
       fc.save();
       fc.translate(x * fx, y * fx);
       fc.rotate(rot);
       fc.scale(s, s);
-      fc.globalAlpha = meta.alpha * clamp01(q / 0.06);
+      fc.globalAlpha = flowerAlpha * flightAlpha(t, meta) * intro;
       fc.drawImage(frag, -CROP.w / 2, -CROP.h / 2);
       fc.restore();
     }
@@ -758,7 +801,7 @@ function initDetailPetals() {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       const g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, 70 * dpr);
-      g2.addColorStop(0, `rgba(255,248,238,${0.28 * glow})`);
+      g2.addColorStop(0, 'rgba(255,248,238,' + (0.28 * glow * flowerAlpha) + ')');
       g2.addColorStop(1, 'rgba(255,248,238,0)');
       ctx.fillStyle = g2;
       ctx.beginPath(); ctx.arc(cx, cy, 70 * dpr, 0, Math.PI * 2); ctx.fill();
@@ -766,13 +809,22 @@ function initDetailPetals() {
     }
     raf = requestAnimationFrame(draw);
   };
-  let built = false;
   const onScroll = () => {
     measure();
     if (!built && scrollY + innerHeight >= detailStart - 600) { built = true; makeFragments(); buildAssembled(); }
-    q = clamp01((scrollY - detailStart) / (innerHeight * 2.2));
+    qRaw = detailStart ? (scrollY - detailStart) / (innerHeight * 2.2) : 0;
+    q = clamp01(qRaw);
+    fadeOut = 1 - smoothstep(1.0, 1.3, qRaw);
+    flowerAlpha = FLOWER_MAX_ALPHA * fadeOut;
+    if (qRaw >= 1.3) {
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      active = false;
+      lastQ = -1;
+      ctx.clearRect(0, 0, w, h);
+      return;
+    }
     const on = scrollY + innerHeight >= detailStart;
-    if (on && !active) { active = true; if (!raf) raf = requestAnimationFrame(draw); }
+    if (on && !active) { active = true; lastQ = -1; if (!raf) raf = requestAnimationFrame(draw); }
     if (!on && active) { active = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } ctx.clearRect(0, 0, w, h); }
   };
   img = new Image();
