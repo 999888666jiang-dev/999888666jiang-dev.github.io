@@ -1,35 +1,32 @@
 .gooey-nav {
   --gn-pad: 6px;
-  --gn-gap: 4px;
-  --gn-font: 14px;
+  --gn-gap: var(--space-1);
   --gn-x: 16px;
   --gn-y: 9px;
   position: relative;
   display: inline-flex;
   max-width: 100%;
-  font-size: var(--gn-font);
+  font-size: var(--fs-body-sm);
   line-height: 1.2;
 }
 
 .gooey-nav--sm {
   --gn-pad: 5px;
-  --gn-gap: 2px;
-  --gn-font: 13px;
+  --gn-gap: calc(var(--space-1) * 0.5);
   --gn-x: 13px;
   --gn-y: 7px;
 }
 
 .gooey-nav--lg {
   --gn-pad: 7px;
-  --gn-gap: 6px;
-  --gn-font: 16px;
+  --gn-gap: calc(var(--space-2) - var(--space-1) * 0.5);
   --gn-x: 20px;
   --gn-y: 11px;
 }
 
 .gooey-nav--framed {
   padding: var(--gn-pad);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--gn-frame);
   box-shadow: var(--gn-frame-shadow);
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
@@ -53,7 +50,7 @@
   top: 0;
   left: 0;
   display: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--gn-pill);
   pointer-events: none;
 }
@@ -84,10 +81,10 @@
 .gooey-nav__link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   padding: var(--gn-y) var(--gn-x);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: none;
   color: var(--gn-muted);
   font: inherit;

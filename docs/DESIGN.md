@@ -1,6 +1,6 @@
 ---
 version: "1.0"
-status: "m11.1c"
+status: "m11.1d"
 updated: "2026-11-23"
 owner: "姜睿 / yunyanfpv.cn"
 principle: "深色产品 + 电影感 signature；单 UI 强调色；不新增字体/依赖"
@@ -33,7 +33,38 @@ typography:
   mono: { size: "12px", line: "1.5", tracking: "0.08em", weight: "400" }
 space: { "0": "0", "1": "4px", "2": "8px", "3": "12px", "4": "16px", "5": "24px", "6": "32px", "7": "48px", "8": "64px", "9": "96px" }
 radius: { sm: "8px", md: "12px", lg: "16px", pill: "999px" }
-z-index: { base: "0", content: "10", overlay: "100", modal: "500", nav: "1000" }
+z-index:
+  base: "0"
+  raised: "1"
+  content: "2"
+  particles: "3"
+  fixed-cards: "4"
+  reveal: "5"
+  scrim: "6"
+  lanyard: "7"
+  narrative: "8"
+  frame: "10"
+  nav: "20"
+  skip: "40"
+  modal: "40"
+  modal-panel: "41"
+  banner: "55"
+  prompt: "60"
+  noise: "99"
+overlay:
+  black: "#000000"
+  white: "#ffffff"
+  scrim-detail: "#050708"
+  scrim-doc: "#060708"
+  scrim-video: "#080a0c"
+  scrim-panel: "#0a0c0e"
+  sheet: "#08090a"
+texture:
+  metal-dark: "#202427"
+  metal-mid: "#3a4145"
+  metal-shadow: "#24292c"
+  metal-hi: "#aeb4b7"
+  metal-lo: "#5f666a"
 motion: { fast: "120ms", base: "180ms", slow: "240ms", slower: "320ms", easing: "cubic-bezier(.16,1,.3,1)" }
 breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280px", wide: "1440px" }
 ---
@@ -51,7 +82,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **字体**：不新增外部字体/CDN；自托管 Instrument Serif + Inter，中文回退 Noto Serif SC / PingFang SC / 微软雅黑；中文标题不做负字距，全大写拉丁 +0.08em。
 - **可读性优先**：正文 ≥4.5:1、大字/UI ≥3:1、focus ring ≥3:1，按最亮帧实测；不达标先加局部卡底/局部 scrim，不整页压暗。
 - **动效**：只动 `opacity`/`transform`；reduced-motion 全静态；单主 rAF，30fps 节流；离屏 cancel。
-- **边界**：不改轮播/详情/Lanyard/滚动叙事/粒子/花瓣交互；首屏 0 mp4、FPS≥55、CLS≤0.1；`noindex` 保持到用户确认发布。
+- **边界**：不改轮播/详情/Lanyard/滚动叙事/粒子/花瓣交互；详情区首屏 0 条 `veldara-loop.mp4`（hero/reveal 主叙事视频按 R-04 加载，375 也属于叙事的一部分）、FPS≥55、CLS≤0.1；`noindex` 保持到用户确认发布。
 
 ## 2. Colors · 颜色
 
@@ -78,8 +109,9 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 卡片底用 `surface-1/2` 或 `rgba(5,7,8,.55)` 局部底；禁止在黑底上直接放 14px 以下灰字。
 - 局部底：文字列/卡加横向渐变到透明的 scrim（`rgba(5,7,8,.55)` 起，不足调 `.58/.62`）。
 - 玻璃卡：`backdrop-filter: blur(10px)` + `surface-2` 半透明；正文不依赖玻璃对比度，必须有实底。
-- **落地（M11.1c）**：`site.css` 已完成 token 化——颜色 98 处、间距 54 处、圆角 27 处改用 token；灰阶收敛为 `canvas / surface-1..3 / ink / muted / subtle` 六档（正文只用 ink/muted/subtle）。
-- **保留的原生值（非散落色）**：M10D 局部底与视频遮罩 `rgba(5,7,8,.x)`（规格裁定值）、交互态描边 `rgba(255,255,255,.2–.4)`、Lanyard 金属扣渐变 5 个灰值（组件视觉不动）。
+- **落地（M11.1d）**：`site.css` + 4 个 islands CSS 的颜色/间距/圆角/z-index 全部 token 化；token 定义行之外的裸色、裸间距、裸圆角、裸层级 = **0**（Node 审计，见 verification §8.26）。灰阶只用 4 档：`ink`（主）/`muted`（次）/`subtle`（UI 弱）/`canvas+surface-1..3`（底）。
+- **alpha 值**：半透明遮罩/局部底统一写 `color-mix(in srgb, var(--color-*) P%, transparent)`（与原 `rgba(...)` 等值）；M10D 局部底裁定值登记为 `overlay.scrim-detail` + alpha（.55 起，不足调 .58/.62）。
+- **遮罩/纹理 token（登记，非第五档灰）**：`overlay.black/white`、`scrim-detail #050708`、`scrim-doc #060708`、`scrim-video #080a0c`、`scrim-panel #0a0c0e`、`sheet #08090a`；Lanyard 金属扣 `texture.metal-*` 5 值（组件纹理，不改视觉）。
 
 **验收**：正文 ≥4.5:1、大字/UI ≥3:1、focus ring ≥3:1；最亮帧采样（详情 p=0–.25、首页 hero 首帧）。
 
@@ -101,12 +133,14 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 中文标题不做负字距（`-0.01em` 只给拉丁 hero-display）；
 - 字体栈加 `system-ui` 兜底；不新增字体文件/依赖。
 - 大字数重量：标题 400（Instrument Serif）/500（Inter），正文 400；不合成粗体。
-- **落地（M11.1c）**：字号下限 12px、正文 16/1.7、中文标题 tracking ≥ -0.01em 已全站实测；computed 档数仍 9–10（见 §10 残留）。
+- **落地（M11.1d）**：字号硬收敛 7 档——所有 `font-size` 声明只允许 `var(--fs-hero|section|heading|body|body-sm|caption|mono)`；clamp 的 min/max 只属于对应级别的边界。grep 实测：声明档数 **7**，任意视口 computed 档数 ≤6（caption/mono 同为 12px）。
+- **原值映射**：118/96→hero；68/60/56/44→section；40/38/30/26/24/22→heading；16→body；15/14/13→body-sm；12→caption 或 mono。旧 token `--fs-display / --fs-statement / --fs-cap / --fs-micro / --fs-lede / --display-xl` 已删除。
+- 移动端回落：`.brand__cap` ≤767 → caption；`.lede` 与 narrative `.s3-note` ≤767 → body（保持移动可读性）。
 
 ## 4. Layout · 布局与间距
 
 - 栅格：内容最大宽 **1200px**；阅读列 **720px**；移动内边距 20–24px，桌面 6vw 或 64px。
-- 间距只取 4 的倍数：`0/4/8/12/16/24/32/48/64/96`（token `space.0–9`）。
+- 间距只取 4 的倍数：`0/4/8/12/16/24/32/48/64/96`（token `space.0–9`）；M11.1d 起 `margin/padding/gap` 的 px 字面量已全部换 token（2/3/6/7/9/10/11/14/18/20/22/26/28/40 → 最近 token，如 18→16、22/26/28→24、10/14→12、6/7/9→8、2/3→4、20→16、40→32）；仅相对单位（em/vh/%）与负偏移保留。
 - 章节结构：kicker（mono）→ 标题（section）→ 内容；章节间距 ≥64px。
 - 卡片网格：桌面 3 列（≥1200 允许 4 列/2×2 视内容），768 2×2，移动 1 列；**等高**。
 - 技能卡（M11.1c）：≥1200 **4 列**、641–1199 2 列、≤640 1 列；`grid-auto-rows:1fr` 保证等高，1440 不再 3+1 落单。
@@ -117,29 +151,27 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 
 - 阴影只用于模态/悬浮：`0 24px 80px rgba(0,0,0,.45)`；静态卡不加大阴影。
 - 玻璃卡阴影：`0 8px 32px rgba(0,0,0,.25)` + hairline 描边。
-- 层级（token `z-index`）：背景 0 → 内容 10 → 覆盖/花瓣/粒子 100 → 模态 500 → 导航 1000。
-- **已知冲突（M11.1c 未机械替换）**：上一行的 0/10/100/500/1000 与本文件 §5 的层序（花瓣 z1、内容 z2、粒子 z3、fixed cards z4…导航更高）不一致；直接替换会翻转花瓣/文字层级，需设计裁定后再统一。
-- 花瓣 z1、内容 z2、粒子 z3、fixed cards z4、导航更高（与 M9/M10 实现一致）。
+- 层级 token（实现值，M11.1d 全量替换，顺序即层序）：`--z-base 0`（视频/背景层）→ `--z-raised 1`（花瓣/静态章节/bloom 底）→ `--z-content 2`（内容流/卡片）→ `--z-particles 3`（粒子/挂绳）→ `--z-fixed-cards 4`（fixed cards/金属扣）→ `--z-reveal 5`（reveal/命中代理）→ `--z-scrim 6` → `--z-lanyard 7` → `--z-narrative 8`（三章固定层）→ `--z-frame 10` → `--z-nav 20`（导航/时钟）→ `--z-skip 40` / `--z-modal 40` / `--z-modal-panel 41` → `--z-banner 55` → `--z-prompt 60` → `--z-noise 99`。
 
 ## 6. Shapes · 圆角与描边
 
 - 圆角：`8px`（小控件/标签）、`12px`（卡片）、`16px`（大卡/模态）、`pill`（按钮/标签）。
 - 描边：1px `hairline`；focus 可见时 2px `ink` 环 + 2px offset（见 Components）。
 - 头像/图标容器用 pill 或 12px；不混用 6px/10px 等非 token 值。
-- **落地（M11.1c）**：`border-radius` 27 处已换 token（6/10/14/18px → sm/md/lg）；50% 圆形（头像点）保留。
+- **落地（M11.1d）**：`border-radius` 全站（含 islands）只用 `sm/md/lg/pill`；圆形用 `--radius-round: 50%`（CTA/头像点）。
 - 分区线用 1px hairline，不用阴影做分割。
 
 ## 7. Components · 组件清单（≥10）
 
 1. **TopNav**（`nav`）：玻璃 pill 容器 + 当前项 off-white 实底；`aria-current`；hover 120ms。
-2. **GooeyNav**（React 岛）：canvas 2D 粒子；静态回退为 TopNav；z 1000。
+2. **GooeyNav**（React 岛）：canvas 2D 粒子；静态回退为 TopNav；`--z-nav`（20）。
 3. **Hero**（电影感三章）：视频背景 + 品牌字 + 章节说明；文字必须局部底；hero 视频 brightness 1.18/scrim .78。
 4. **SectionHeader**：mono kicker + section 标题 + hairline 分隔；编号 01–05 用 CSS counter。
 5. **GlassCard**：`surface-2` 半透明 + blur(10px) + hairline；正文必须 ≥4.5:1。
-6. **ExpCard**：公司/日期/角色/要点；桌面 3 列 grid、移动 1 列、实底 `rgba(8,9,10,.90)`。
+6. **ExpCard**：公司/日期/角色/要点；桌面 3 列 grid、移动 1 列、`--color-sheet` 90%（color-mix）+ hairline。
 7. **ProjectCard**：静态项目卡 + 技术栈 tag pill + 详情按钮；hover 120ms + translateY(-1px)。
 8. **CircularGallery**：3D 轮播岛；键盘 Enter/Space 开卡；离开视口暂停 autoScroll。
-9. **DetailModal**（ReflectiveCard）：模态 z500；遮罩点击/关闭/Esc/返回四路径；关闭恢复 scrollY±2；焦点回 `.circular-gallery`。
+9. **DetailModal**（ReflectiveCard）：`--z-modal 40` / `--z-modal-panel 41`；遮罩点击/关闭/Esc/返回四路径；关闭恢复 scrollY±2；焦点回 `.circular-gallery`。
 10. **ContactCard**：邮箱/GitHub 按钮 + 联系说明；按钮 ≥4.5:1；不出现手机号。
 11. **ButtonPrimary**：`primary` 底 + `on-primary` 文字 + pill；hover 亮度 +8%，focus ring 2px。
 12. **Pill/Tag**：mono caption + hairline 描边 + 8px 圆角；可交互时 focus ring。
@@ -171,7 +203,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 | ≥1280 | 内容 1200，3–4 列 | 完整动效/轮播/花瓣 |
 | 900–1279 | 内容 100% 96vw，2–3 列 | 完整动效 |
 | 768–899 | 2×2 卡 | 简化动效；花瓣/视频按既有规则 |
-| ≤767 | 1 列，内边距 20–24 | 只 poster + 静态内容；不加载视频/花瓣/粒子 |
+| ≤767 | 1 列，内边距 20–24 | 详情区只 poster + 静态内容；hero/reveal 主叙事视频照常加载（叙事一部分） |
 
 - `pointer:coarse` 与 `prefers-reduced-motion: reduce` 视为降级：不初始化 canvas/video 动画，只保留 poster + 静态五段。
 - 无 JS：noscript 兜底 poster + 文案，500vh 类滚动区收起为普通高度，不制造空白滚动。
@@ -183,6 +215,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **M11.1 P0**：字号收敛 7 级（正文 16/1.7、无 <12px、中文无负字距、system-ui）、`:focus-visible` 2px+offset2、颜色/间距/圆角/z-index 走 token、灰阶收敛 4 档、文字列局部底 AA；清理 `index.html` 字面量 `\n`；OG/canonical 改 `https://yunyanfpv.cn/`。
   - **进度（2026-11-23，M11.1c）**：site.css 颜色/间距/圆角 token 化（98/54/27 处）；灰阶收敛 4 档；字号下限 12px、正文 16/1.7、中文 tracking ≥ -0.01em；`:focus-visible` 2px+2px；AA 复测 p95：正文 ≥6.74、大字 ≥5.93（品牌字 p95）、hero caption 4.28→5.39（局部暗光晕，不改布局/不整页压暗）、focus ring 11.76；技能 4 卡 4/2/1 列等高；`index.html` 字面量 `\n` 清理、canonical/og 统一 yunyanfpv.cn（含运行时 `site-content.js`，修 main.js 覆盖回 github.io）；修复 `lastFlight` 未声明导致 strict-mode ReferenceError（M10 遗留）。
   - **残留（转 M11.2/P2）**：字号 computed 仍有 9–10 档；islands CSS 未 token 化；M10D scrim/交互态描边按裁定保留（§2）；z-index 规格冲突（§5，需裁定）；非 4 倍数间距（6/10/14/18/20/22/26/28px）未收敛。
-- **M11.2 P1**：技能 4 卡（≥1200 4 列或 2×2、768 2×2、移动 1 列、等高）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数、内容 1200/阅读 720、hover 120ms + -1px、四态。
+- **M11.1d（B 批次，2026-11-23）**：字号硬收敛 7 档；颜色/间距/圆角/z-index 全量 token（裸值 0）；灰阶 4 档；AA 复测（正文 p95 ≥6.74、大字 ≥17.9、hero caption ≥10.98、focus ring 11.76）；技能 4 卡 4/2/1 列等高（保持）；**移动端视频保持现状**（≤600px 详情区 poster，hero/reveal 不改 poster-only）；DESIGN §10「首屏 0 mp4」按实际口径改写为详情区口径。
+- **M11.2 P1**：技能 4 卡（已 4/2/1 等高，余：2×2 与 4 列的二选一定稿）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数（已达成）、内容 1200/阅读 720、hover 120ms + -1px、四态。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
-- **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55、首屏 0 mp4、0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；详情四路径 + 键盘回归；`noindex` 保持。
+- **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55、详情区首屏 0 条 `veldara-loop.mp4`、0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；详情四路径 + 键盘回归；`noindex` 保持。
