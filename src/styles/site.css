@@ -887,9 +887,9 @@ html.detail-lock { overscroll-behavior: none; }
   padding: 0 max(var(--frame), env(safe-area-inset-left)) clamp(64px, 10vh, 120px);
 }
 .doc-section {
-  max-width: 1160px;
+  max-width: var(--content-w);
   margin: 0 auto;
-  padding: clamp(48px, 8vh, 96px) 0;
+  padding: var(--section-gap) 0;
   border-top: 1px solid var(--color-hairline);
 }
 .doc-section:first-child { border-top: 0; }
@@ -908,7 +908,7 @@ html.detail-lock { overscroll-behavior: none; }
 }
 .doc-lede {
   margin: 0 0 var(--space-28);
-  max-width: 68ch;
+  max-width: var(--read-w);
   color: var(--color-muted);
   font-size: var(--fs-body);
   line-height: 1.65;
@@ -1000,7 +1000,7 @@ html.detail-lock { overscroll-behavior: none; }
 .project-card__links { display: flex; gap: var(--space-4); margin-top: auto; padding-top: var(--space-1); }
 .project-card__link { color: var(--color-ink); font-size: var(--fs-caption); text-decoration: underline; text-underline-offset: 3px; }
 .project-card__link--muted { color: var(--color-subtle); text-decoration: none; }
-.nda-note { margin: var(--space-20) 0 0; max-width: 70ch; color: var(--color-subtle); font-size: var(--fs-body-sm); line-height: 1.6; }
+.nda-note { margin: var(--space-20) 0 0; max-width: var(--read-w); color: var(--color-subtle); font-size: var(--fs-body-sm); line-height: 1.6; }
 
 .honor-list,
 .cert-list { margin: 0; padding-left: var(--space-20); color: var(--color-muted); font-size: var(--fs-body-sm); line-height: 1.7; }
@@ -1015,7 +1015,7 @@ html.detail-lock { overscroll-behavior: none; }
   color: var(--color-primary);
 }
 .doc-foot {
-  max-width: 1160px;
+  max-width: var(--content-w);
   margin: 0 auto;
   padding-top: var(--space-28);
   border-top: 1px solid var(--color-hairline);
@@ -1048,7 +1048,7 @@ html.past-narrative .nav-slot {
 }
 @media (max-width: 640px) {
   .project-grid { grid-template-columns: 1fr; }
-  .doc-section { padding: clamp(40px, 7vh, 72px) 0; }
+  .doc-section { padding: var(--section-gap) 0; }
 }
 
 
@@ -1088,7 +1088,7 @@ html.past-narrative .nav-slot {
 :root {
   --font-display: 'Instrument Serif', 'Songti SC', 'STSong', 'Noto Serif SC', 'SimSun', serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Consolas', 'SFMono-Regular', monospace;
-  --section-gap: clamp(56px, 9vh, 112px);
+  --section-gap: var(--space-9);
   --glass-bg: rgba(255, 255, 255, 0.035);
   --glass-border: var(--color-hairline);
   --rule: var(--color-hairline);
@@ -1598,6 +1598,8 @@ html.detail-bg-on .detail-petals { opacity: 1; }
   --color-scrim-detail: #050708; --color-scrim-doc: #060708; --color-scrim-video: #080a0c; --color-scrim-panel: #0a0c0e; --color-sheet: #08090a;
   --color-metal-dark: #202427; --color-metal-mid: #3a4145; --color-metal-shadow: #24292c; --color-metal-hi: #aeb4b7; --color-metal-lo: #5f666a;
   --radius-round: 50%;
+  /* M11.2 P1 layout widths */
+  --content-w: 1200px; --read-w: 720px;
   --dur-fast: 120ms; --dur-base: 180ms; --dur-slow: 240ms; --dur-slower: 320ms;
   --font-sans: Inter, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
@@ -1605,4 +1607,131 @@ body { font-family: var(--font-sans); font-size: var(--fs-body); line-height: 1.
 :where(a, button, input, textarea, select, [tabindex], summary):focus-visible {
   outline: 2px solid var(--color-ink) !important;
   outline-offset: 2px !important;
+}
+
+/* ================= M11.2 P1: cards / states / touch ================= */
+:root {
+  --content-w: 1200px;
+  --read-w: 720px;
+}
+.doc-section { max-width: var(--content-w); padding: var(--section-gap) 0; }
+.doc-foot { max-width: var(--content-w); }
+.doc-lede,
+.nda-note { max-width: var(--read-w); }
+@media (max-width: 899px) { :root { --section-gap: var(--space-8); } }
+@media (max-width: 640px) { :root { --section-gap: var(--space-7); } }
+
+/* unified card surface */
+#about .skill-card,
+#experience .exp-card,
+#honors .honor-list > li,
+#contact .contact-card {
+  padding: var(--space-5);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-sheet) 90%, transparent);
+  transition: opacity var(--dur-slower) var(--ease-expo), transform var(--dur-slower) var(--ease-expo),
+    translate var(--dur-fast) var(--ease-expo), border-color var(--dur-fast) var(--ease-expo),
+    background-color var(--dur-fast) var(--ease-expo);
+}
+#projects .project-card {
+  padding: 0;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-sheet) 90%, transparent);
+  transition: opacity var(--dur-slower) var(--ease-expo), transform var(--dur-slower) var(--ease-expo),
+    translate var(--dur-fast) var(--ease-expo), border-color var(--dur-fast) var(--ease-expo);
+}
+#projects .project-card__body { padding: var(--space-5); }
+#projects .project-card__stack li { border-radius: var(--radius-pill); }
+#projects .project-card__link { display: inline-flex; align-items: center; min-height: 32px; padding-block: var(--space-1); }
+
+#about .skill-card:hover,
+#experience .exp-card:hover,
+#honors .honor-list > li:hover,
+#projects .project-card:hover,
+#contact .contact-card:hover {
+  transform: none;
+  translate: 0 -1px;
+  border-color: color-mix(in srgb, var(--color-white) 30%, transparent);
+}
+#about .skill-card:active,
+#experience .exp-card:active,
+#honors .honor-list > li:active,
+#projects .project-card:active,
+#contact .contact-card:active {
+  translate: 0 0;
+  border-color: color-mix(in srgb, var(--color-white) 36%, transparent);
+}
+#projects .project-card:focus-within {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* experience: one card system, 3-col grid (768/tablet 1-col) */
+#experience .exp-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); align-items: stretch; }
+@media (max-width: 899px) { #experience .exp-list { grid-template-columns: 1fr; } }
+
+/* honors: one card system, honors + certificates in the same list/grid */
+#honors .honor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: honor;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+#honors .honor-list > li {
+  counter-increment: honor;
+  position: relative;
+  display: block;
+  min-height: 0;
+  max-height: none;
+  backdrop-filter: none;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body-sm);
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+#honors .honor-list > li::before {
+  content: counter(honor, decimal-leading-zero);
+  position: static;
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.08em;
+  color: var(--color-subtle);
+}
+#honors .honor-card__kind {
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.08em;
+  color: var(--color-subtle);
+}
+#honors .honor-card__text { display: block; margin-top: var(--space-2); }
+
+/* content links/buttons: hover/active/focus/disabled + touch targets */
+.content-flow :is(a, button) {
+  transition: opacity var(--dur-fast) var(--ease-expo), transform var(--dur-fast) var(--ease-expo),
+    border-color var(--dur-fast) var(--ease-expo);
+  min-height: 32px;
+}
+.content-flow :is(a, button):hover { opacity: 1; transform: translateY(-1px); }
+.content-flow :is(a, button):active { opacity: 0.85; transform: translateY(0); }
+.content-flow :is(a, button):disabled,
+.content-flow :is(a, button)[aria-disabled="true"],
+.content-flow .is-disabled { opacity: 0.45; pointer-events: none; cursor: not-allowed; }
+#contact .contact-cta { transition: translate var(--dur-fast) var(--ease-expo), border-color var(--dur-fast) var(--ease-expo), transform var(--dur-fast) var(--ease-expo); }
+#contact .contact-cta:hover { transform: none; translate: 0 -1px; }
+#contact .contact-cta:active { transform: none; translate: 0 0; }
+@media (pointer: coarse) {
+  .content-flow :is(a, button) { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #about .skill-card, #experience .exp-card, #honors .honor-list > li, #projects .project-card, #contact .contact-card,
+  .content-flow :is(a, button), #contact .contact-cta { transition: none; }
+  #about .skill-card:hover, #experience .exp-card:hover, #honors .honor-list > li:hover, #projects .project-card:hover, #contact .contact-card:hover,
+  .content-flow :is(a, button):hover, #contact .contact-cta:hover { translate: none; transform: none; }
 }

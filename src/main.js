@@ -152,21 +152,6 @@ function renderExperience() {
       exp.append(card);
     }
   }
-  const campus = $('[data-campus]');
-  if (campus) {
-    for (const item of content.campus ?? []) {
-      const row = make('p', 'campus-row');
-      row.append(make('span', 'campus-row__title', item.title ?? ''));
-      if (item.period) row.append(make('span', 'campus-row__period', item.period));
-      row.append(make('span', 'campus-row__detail', item.detail ?? ''));
-      campus.append(row);
-    }
-  }
-  const education = $('[data-education]');
-  if (education && content.education) {
-    const e = content.education;
-    education.textContent = `${e.school ?? ''} · ${e.major ?? ''} · ${e.degree ?? ''} · ${e.period ?? ''}${e.note ? `（${e.note}）` : ''}`;
-  }
 }
 
 function renderProjects() {
@@ -255,10 +240,18 @@ function renderProjects() {
 }
 
 function renderHonors() {
-  const honors = $('[data-honors]');
-  if (honors) for (const item of content.honors ?? []) honors.append(make('li', null, item));
-  const certs = $('[data-certificates]');
-  if (certs) for (const item of content.certificates ?? []) certs.append(make('li', null, item));
+  const list = $('[data-honors]');
+  if (!list) return;
+  const add = (items, kind) => {
+    for (const item of items ?? []) {
+      const li = make('li', 'honor-card');
+      li.append(make('span', 'honor-card__kind', kind));
+      li.append(make('span', 'honor-card__text', item));
+      list.append(li);
+    }
+  };
+  add(content.honors, '荣誉');
+  add(content.certificates, '证书');
 }
 
 function renderContact() {
