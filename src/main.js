@@ -696,7 +696,8 @@ function initDetailPetals() {
     const d = id.data;
     for (let i = 0; i < d.length; i += 4) {
       const lum = Math.max(d[i], d[i + 1], d[i + 2]);
-      d[i + 3] = Math.min(255, Math.round(lum * 1.25));
+      const a = Math.min(255, Math.max(0, (lum - 24) * 1.8)) * 0.9;
+      d[i + 3] = Math.round(a);
     }
     g.putImageData(id, 0, 0);
   };
@@ -715,17 +716,6 @@ function initDetailPetals() {
   const flightAlpha = (t, meta) => {
     if (t >= 0.9) return 0.90 + (meta.alpha - 0.90) * clamp01((t - 0.9) / 0.1);
     return 0.22 + (0.90 - 0.22) * (t / 0.9);
-  };
-  const drawCropBlend = () => {
-    if (!assembled || flowerAlpha <= 0) return;
-    const a = Math.min(0.15, Math.max(0, (q - 0.84) / 0.16 * 0.15)) * flowerAlpha;
-    if (a <= 0) return;
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = a;
-    ctx.translate(cx, cy); ctx.scale(scale, scale);
-    ctx.drawImage(assembled, -CROP.w / 2, -CROP.h / 2);
-    ctx.restore();
   };
   const drawSettled = () => {
     if (!assembled || flowerAlpha <= 0) return;
@@ -754,7 +744,7 @@ function initDetailPetals() {
     const rotB = q > 0.90 ? Math.sin(now / 1600) * 0.004 : 0;
     const glow = clamp01((q - 0.84) / 0.10);
     ctx.clearRect(0, 0, w, h);
-    if (qRaw >= 0.70) { drawSettled(); drawCropBlend(); raf = requestAnimationFrame(draw); return; }
+    if (qRaw >= 0.70) { drawSettled(); raf = requestAnimationFrame(draw); return; }
     ensureFlight();
     const fx = 720 / innerWidth;
     const fc = flightBuf.getContext('2d');
