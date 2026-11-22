@@ -498,4 +498,134 @@ function initDetailBg() {
     }, { rootMargin: '300px 0px' }).observe(about);
   }
 }
-initDetailBg();
+initDetailBg();/* M8.6 Bloom 开场幕：canvas 双缓冲擦洗（lerp 0.08 / safeSeek / 生命周期不黑屏） */
+function initBloomAct() {
+  const section = $('[data-bloom-act]');
+  if (!section) return;
+  const kicker = $('[data-act-kicker]');
+  if (kicker) kicker.textContent = content.act?.kicker ?? '';
+  const items = [...section.querySelectorAll('[data-act-item]')];
+  items.forEach((item, index) => {
+    item.querySelector('.bloom-act__no').textContent = `0${index + 1} / 03`;
+    item.querySelector('p').textContent = content.act?.items?.[index] ?? '';
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 899px)').matches;
+  if (reduced || coarse) return;
+  const canvas = $('[data-act-canvas]');
+  const ctx = canvas.getContext('2d');
+  const videos = [...section.querySelectorAll('[data-act-video]')];
+  const srcs = ['/media/detail/bloom-loop.mp4', '/media/detail/bloom-act-2.mp4', '/media/detail/bloom-act-3.mp4'];
+  const posters = ['/media/detail/bloom-poster.jpg', '/media/detail/bloom-act-2-poster.jpg', '/media/detail/bloom-act-3-poster.jpg'];
+  const keys = ['v1', 'v2', 'v3'];
+  const images = posters.map((src) => { const img = new Image(); img.src = src; return img; });
+  const seeking = { v1: false, v2: false, v3: false };
+  const pending = { v1: -1, v2: -1, v3: -1 };
+  const loaded = new Set();
+  let offscreen = null;
+  let w = 0; let h = 0; let dpr = 1;
+  let current = 0; let target = 0; let raf = 0;
+  let actStart = 0; let actEnd = 0; let span = 1;
+  const activeKey = (p) => (p <= 1 / 3 ? 'v1' : p <= 2 / 3 ? 'v2' : 'v3');
+  const localOf = (p, key) => {
+    if (key === 'v1') return Math.min(1, Math.max(0, p * 3));
+    if (key === 'v2') return Math.min(1, Math.max(0, (p - 1 / 3) * 3));
+    return Math.min(1, Math.max(0, (p - 2 / 3) * 3));
+  };
+  const resize = () => {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = section.clientWidth;
+    h = innerHeight;
+    canvas.width = Math.max(1, Math.round(w * dpr));
+    canvas.height = Math.max(1, Math.round(h * dpr));
+    if (!offscreen) offscreen = document.createElement('canvas');
+    offscreen.width = canvas.width;
+    offscreen.height = canvas.height;
+    drawFrame();
+  };
+  const drawFrame = () => {
+    if (!ctx || !w || !h) return;
+    const key = activeKey(current);
+    const index = keys.indexOf(key);
+    const video = videos[index];
+    const ready = video && video.readyState >= 2;
+    const source = ready ? video : images[index];
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const oc = offscreen.getContext('2d');
+    oc.setTransform(1, 0, 0, 1, 0, 0);
+    oc.clearRect(0, 0, offscreen.width, offscreen.height);
+    const sw = ready ? video.videoWidth : images[index].naturalWidth || 1280;
+    const sh = ready ? video.videoHeight : images[index].naturalHeight || 720;
+    if (!sw || !sh) return;
+    const scale = Math.max(canvas.width / sw, canvas.height / sh);
+    const dw = sw * scale; const dh = sh * scale;
+    const ox = (canvas.width - dw) / 2; const oy = (canvas.height - dh) / 2;
+    try { oc.drawImage(source, ox, oy, dw, dh); } catch { return; }
+    ctx.drawImage(offscreen, 0, 0);
+  };
+  const ensure = (index) => {
+    if (loaded.has(index)) return;
+    loaded.add(index);
+    const video = videos[index];
+    video.src = srcs[index];
+    video.preload = 'auto';
+    video.load();
+    video.addEventListener('loadedmetadata', () => { if (keys[index] === activeKey(current)) { safeSeek(keys[index], localOf(current, keys[index]) * 8); drawFrame(); } }, { once: true });
+    video.addEventListener('seeked', () => {
+      const key = keys[index];
+      seeking[key] = false;
+      if (key === activeKey(current)) drawFrame();
+      if (pending[key] >= 0) { const t = pending[key]; pending[key] = -1; safeSeek(key, t); }
+    });
+  };
+  const safeSeek = (key, time) => {
+    const index = keys.indexOf(key);
+    ensure(index);
+    const video = videos[index];
+    const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 8;
+    const clamped = Math.min(1, Math.max(0, time / duration)) * duration;
+    if (Math.abs(video.currentTime - clamped) < 0.01) { drawFrame(); return; }
+    if (seeking[key]) { pending[key] = clamped; return; }
+    seeking[key] = true; pending[key] = -1;
+    try { if (typeof video.fastSeek === 'function') video.fastSeek(clamped); else video.currentTime = clamped; } catch { seeking[key] = false; }
+  };
+  const tick = () => {
+    raf = 0;
+    current += (target - current) * 0.08;
+    const inAct = scrollY + innerHeight >= actStart && scrollY <= actEnd + innerHeight;
+    document.documentElement.classList.toggle('act-mode', inAct);
+    const p = Math.min(1, Math.max(0, current));
+    const key = activeKey(p);
+    const index = keys.indexOf(key);
+    safeSeek(key, localOf(p, key) * 8);
+    drawFrame();
+    videos.forEach((video, i) => { if (i !== index) video.pause(); });
+    items.forEach((item, i) => item.classList.toggle('is-active', i === index));
+    const nearEnd = scrollY > actStart - innerHeight - 600;
+    if (nearEnd && scrollY < actEnd + innerHeight) raf = requestAnimationFrame(tick);
+    else {
+      videos.forEach((video) => video.pause());
+    }
+  };
+  const measure = () => {
+    actStart = section.offsetTop;
+    actEnd = actStart + section.offsetHeight;
+    span = Math.max(1, section.offsetHeight - innerHeight);
+  };
+  const onScroll = () => {
+    const p = Math.min(1, Math.max(0, (scrollY - actStart) / span));
+    target = p;
+    const inAct = scrollY + innerHeight >= actStart && scrollY <= actEnd + innerHeight;
+    document.documentElement.classList.toggle('act-mode', inAct);
+    // 阶段前 0.15 预载下一段（不靠 safeSeek 才加载）
+    if (p >= 1 / 3 - 0.15) ensure(1);
+    if (p >= 2 / 3 - 0.15) ensure(2);
+    if (!raf && scrollY > actStart - innerHeight - 600 && scrollY < actEnd + innerHeight) raf = requestAnimationFrame(tick);
+  };
+  measure(); resize();
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', () => { measure(); resize(); });
+  onScroll();
+}
+initBloomAct();

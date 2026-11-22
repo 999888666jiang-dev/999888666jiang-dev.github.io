@@ -105,6 +105,39 @@
   <div class="runway-2" data-runway="2" aria-hidden="true"></div>
   <div class="runway-3" data-runway="3" aria-hidden="true"></div>
 
+  <!-- M8.5/M8.6 Bloom 开场幕：500vh sticky + canvas 双缓冲擦洗（视频 0×0 隐藏；移动/reduced 三屏 poster） -->
+  <section class="bloom-act" id="act" data-bloom-act aria-label="Bloom 开场">
+    <div class="bloom-act__stage">
+      <canvas class="bloom-act__canvas" data-act-canvas aria-hidden="true"></canvas>
+      <video class="bloom-act__source" data-act-video="0" muted playsinline preload="none" poster="/media/detail/bloom-poster.jpg" aria-hidden="true"></video>
+      <video class="bloom-act__source" data-act-video="1" muted playsinline preload="none" poster="/media/detail/bloom-act-2-poster.jpg" aria-hidden="true"></video>
+      <video class="bloom-act__source" data-act-video="2" muted playsinline preload="none" poster="/media/detail/bloom-act-3-poster.jpg" aria-hidden="true"></video>
+      <div class="bloom-act__fallback" aria-hidden="true">
+        <div class="bloom-act__screen" style="background-image:url('/media/detail/bloom-poster.jpg')"></div>
+        <div class="bloom-act__screen" style="background-image:url('/media/detail/bloom-act-2-poster.jpg')"></div>
+        <div class="bloom-act__screen" style="background-image:url('/media/detail/bloom-act-3-poster.jpg')"></div>
+      </div>
+      <div class="bloom-act__scrim" aria-hidden="true"></div>
+      <div class="bloom-act__copy">
+        <p class="bloom-act__kicker" data-act-kicker></p>
+        <ol class="bloom-act__items">
+          <li class="bloom-act__item" data-act-item="0"><span class="bloom-act__no"></span><p></p></li>
+          <li class="bloom-act__item" data-act-item="1"><span class="bloom-act__no"></span><p></p></li>
+          <li class="bloom-act__item" data-act-item="2"><span class="bloom-act__no"></span><p></p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  <noscript><style>
+    .bloom-act { height: auto !important; }
+    .bloom-act__stage { position: static !important; height: auto !important; overflow: visible !important; }
+    .bloom-act__canvas, .bloom-act__source { display: none !important; }
+    .bloom-act__fallback { display: grid !important; }
+    .bloom-act__screen { height: 100vh; background-size: cover; background-position: center; }
+    .bloom-act__copy { position: static !important; padding: 48px 6vw; }
+    .bloom-act__items { position: static !important; display: grid !important; gap: 24px; min-height: 0; }
+    .bloom-act__item { position: static !important; opacity: 1 !important; transform: none !important; }
+  </style></noscript>
   <!-- M8.4 详情区 Bloom 背景层（仅内容区可见；hero 三章不出现） -->
   <div class="detail-bg" data-detail-bg aria-hidden="true">
     <video class="detail-bg__video" data-detail-bg-video aria-hidden="true" muted loop playsinline preload="none" poster="/media/detail/bloom-poster.jpg"></video>
