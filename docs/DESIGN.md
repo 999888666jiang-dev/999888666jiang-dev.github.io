@@ -1,6 +1,6 @@
 ---
 version: "1.0"
-status: "draft-m11.0"
+status: "draft-m11.1"
 updated: "2026-11-23"
 owner: "姜睿 / yunyanfpv.cn"
 principle: "深色产品 + 电影感 signature；单 UI 强调色；不新增字体/依赖"
@@ -175,6 +175,8 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 
 - **M11.0（本文档）**：只出 DESIGN.md，不改样式。验收：YAML 可解析、8 章齐、token 表完整、components ≥10、无散落裸色值（颜色集中在 Colors 章）。
 - **M11.1 P0**：字号收敛 7 级（正文 16/1.7、无 <12px、中文无负字距、system-ui）、`:focus-visible` 2px+offset2、颜色/间距/圆角/z-index 走 token、灰阶收敛 4 档、文字列局部底 AA；清理 `index.html` 字面量 `\n`；OG/canonical 改 `https://yunyanfpv.cn/`。
+  - **进度（2026-11-23）**：token 已入 `site.css :root`；正文 16/1.7、全站无 <12px、中文标题 tracking ≥ -0.01em、`:focus-visible` 2px+2px、OG/canonical 已改；实测见 `docs/verification.md` §8.24。
+  - **残留（转 M11.2/P2）**：计算字号仍有 9–10 档（clamp 未收成 7 级）、CSS 裸色值/间距/圆角未全量走 token、灰阶 4 档未落。
 - **M11.2 P1**：技能 4 卡（≥1200 4 列或 2×2、768 2×2、移动 1 列、等高）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数、内容 1200/阅读 720、hover 120ms + -1px、四态。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
 - **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55、首屏 0 mp4、0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；详情四路径 + 键盘回归；`noindex` 保持。
