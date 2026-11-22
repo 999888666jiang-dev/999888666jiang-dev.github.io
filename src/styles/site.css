@@ -58,7 +58,7 @@ a:hover { opacity: 0.6; }
   position: fixed;
   left: 12px;
   top: 12px;
-  z-index: var(--z-skip);
+  z-index: var(--z-toast);
   padding: var(--space-2) var(--space-3);
   background: var(--color-primary);
   color: var(--color-on-primary);
@@ -235,7 +235,7 @@ html.narrative .lanyard-layer {
   opacity: calc(1 - var(--exit));
   transform: translate3d(0, calc(var(--exit) * -28px), 0);
 }
-.lanyard-3d { position: absolute; inset: 0; z-index: var(--z-base); pointer-events: none; }
+.lanyard-3d { position: absolute; inset: 0; z-index: var(--z-media); pointer-events: none; }
 .lanyard-3d canvas { display: block; width: 100%; height: 100%; pointer-events: none; }
 .lanyard-card {
   position: absolute;
@@ -244,7 +244,7 @@ html.narrative .lanyard-layer {
   width: var(--lanyard-card-w);
   height: var(--lanyard-card-h);
   transform: translateX(-50%);
-  z-index: var(--z-content);
+  z-index: 2; /* Lanyard local stacking context (not a global token) */
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-surface-1);
@@ -271,7 +271,7 @@ html.narrative .lanyard-layer {
   border-radius: var(--radius-sm);
   background: linear-gradient(90deg, var(--color-metal-dark), var(--color-metal-mid) 45%, var(--color-metal-shadow));
   box-shadow: 0 1px 2px color-mix(in srgb, var(--color-black) 35%, transparent);
-  z-index: var(--z-particles);
+  z-index: 3; /* local stacking context */
 }
 .lanyard-clamp {
   display: none;
@@ -284,7 +284,7 @@ html.narrative .lanyard-layer {
   border-radius: var(--radius-sm);
   background: linear-gradient(180deg, var(--color-metal-hi), var(--color-metal-lo));
   box-shadow: 0 2px 6px color-mix(in srgb, var(--color-black) 35%, transparent);
-  z-index: var(--z-fixed-cards);
+  z-index: 4; /* local stacking context */
 }
 /* 命中代理：仅 3D 态可交互（卡片 rest bbox + 24px），canvas 本身 pointer-events:none */
 .lanyard-hit {
@@ -294,7 +294,7 @@ html.narrative .lanyard-layer {
   width: calc(var(--lanyard-card-w) + 48px);
   height: calc(var(--lanyard-card-h) + 48px);
   transform: translateX(-50%);
-  z-index: var(--z-reveal);
+  z-index: 5; /* local stacking context */
   pointer-events: none;
   touch-action: pan-y;
   cursor: grab;
@@ -315,7 +315,7 @@ html[data-lanyard-state="static"] .lanyard-clamp { display: block; }
 .sec2,
 .sec3 {
   position: relative;
-  z-index: var(--z-raised);
+  z-index: var(--z-content);
   padding: clamp(56px, 10vh, 120px) max(var(--frame), env(safe-area-inset-left));
   border-top: 1px solid var(--color-hairline);
 }
@@ -369,7 +369,7 @@ html.narrative .stage {
   position: fixed;
   inset: 0;
   height: auto;
-  z-index: var(--z-base);
+  z-index: var(--z-media);
   opacity: calc(1 - var(--stage-out));
   pointer-events: none;
 }
@@ -647,7 +647,7 @@ html.narrative .runway-3 { height: var(--runway-3); }
   left: 0;
   right: 0;
   top: 0;
-  z-index: var(--z-banner);
+  z-index: var(--z-overlay);
   padding: var(--space-2) var(--space-3);
   background: color-mix(in srgb, var(--color-scrim-panel) 88%, transparent);
   color: var(--color-primary);
@@ -668,7 +668,7 @@ html.orientation-lock { overscroll-behavior: none; }
 .orientation-prompt {
   position: fixed;
   inset: 0;
-  z-index: var(--z-prompt);
+  z-index: var(--z-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -705,10 +705,8 @@ html.orientation-lock { overscroll-behavior: none; }
 .orientation-hint { margin: var(--space-2) 0 0; font-size: var(--fs-caption); line-height: 1.4; color: var(--color-subtle); }
 .orientation-card :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 
-/* M6.3：ReflectiveCard 详情（单一路径；遮罩 z40 / 卡片 z41） */
+/* M6.3：ReflectiveCard 详情（单一路径；遮罩 z500 / 卡片 z1000） */
 :root {
-  --z-modal: 40;
-  --z-modal-panel: 41;
   --modal-backdrop: rgba(0, 0, 0, 0.72);
   --modal-w-desktop: 420px;
   --modal-h-desktop: 540px;
@@ -724,7 +722,7 @@ html.detail-lock { overscroll-behavior: none; }
 .detail-modal {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal);
+  z-index: var(--z-overlay);
   display: grid;
   place-items: center;
   padding: var(--space-4);
@@ -733,7 +731,7 @@ html.detail-lock { overscroll-behavior: none; }
 .detail-modal[hidden] { display: none; }
 .detail-panel {
   position: relative;
-  z-index: var(--z-modal-panel);
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   max-width: calc(100vw - 32px);
@@ -871,7 +869,7 @@ html.detail-lock { overscroll-behavior: none; }
   right: 0;
   height: var(--gallery-fade-size);
   pointer-events: none;
-  z-index: var(--z-raised);
+  z-index: var(--z-content);
 }
 .projects-stage::before { top: 0; background: linear-gradient(180deg, var(--gallery-fade-color), transparent); }
 .projects-stage::after { bottom: 0; background: linear-gradient(0deg, var(--gallery-fade-color), transparent); }
@@ -884,7 +882,7 @@ html.detail-lock { overscroll-behavior: none; }
 /* ===== M6.1 文档流内容区（X-05；模块化：区块独立、只吃内容源） ===== */
 .content-flow {
   position: relative;
-  z-index: var(--z-particles);
+  z-index: var(--z-content);
   background: var(--color-canvas);
   padding: 0 max(var(--frame), env(safe-area-inset-left)) clamp(64px, 10vh, 120px);
 }
@@ -1201,7 +1199,7 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: var(--z-noise);
+  z-index: var(--z-overlay);
   pointer-events: none;
   opacity: var(--noise-opacity);
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.6'/></svg>");
@@ -1338,7 +1336,7 @@ body::after {
 .doc-bg {
   position: fixed;
   inset: 0;
-  z-index: var(--z-base);
+  z-index: var(--z-media);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--doc-bg-fade) ease;
@@ -1378,7 +1376,7 @@ html.doc-bg-on .doc-bg { opacity: 1; }
 .detail-bg {
   position: fixed;
   inset: 0;
-  z-index: var(--z-base);
+  z-index: var(--z-media);
   pointer-events: none;
   overflow: hidden;
   opacity: 0;
@@ -1410,7 +1408,7 @@ html.detail-bg-on .detail-bg { opacity: 1; }
   --detail-bg-opacity: 0.52;
   --detail-bg-filter: saturate(0.85) brightness(0.88);
 }
-.bloom-act { position: relative; z-index: var(--z-raised); height: 500vh; background: var(--color-canvas); }
+.bloom-act { position: relative; z-index: var(--z-petals); height: 500vh; background: var(--color-canvas); }
 .bloom-act__stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--color-canvas); }
 .bloom-act__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .bloom-act__source { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
@@ -1466,7 +1464,7 @@ html.act-mode .lanyard-layer,
 html.act-mode .scrim { display: none !important; }
 
 /* M9 详情区：帧序列 canvas 背景（poster 兜底） */
-.detail-bg { position: fixed; inset: 0; z-index: var(--z-base); pointer-events: none; opacity: 0; transition: opacity var(--dur-slow) ease; background: var(--color-canvas); }
+.detail-bg { position: fixed; inset: 0; z-index: var(--z-media); pointer-events: none; opacity: 0; transition: opacity var(--dur-slow) ease; background: var(--color-canvas); }
 html.detail-bg-on .detail-bg { opacity: 1; }
 .detail-bg__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
 .detail-bg__poster { position: absolute; inset: 0; background: url('/media/detail/veldara-poster.jpg') center / cover no-repeat; }
@@ -1488,10 +1486,10 @@ html.detail-bg-on .detail-particles { opacity: 1; }
 .detail-bg__scrim { background: linear-gradient(180deg, color-mix(in srgb, var(--color-scrim-detail) 72%, transparent), color-mix(in srgb, var(--color-scrim-detail) 62%, transparent) 45%, color-mix(in srgb, var(--color-scrim-detail) 70%, transparent)); }
 
 /* M9 fixed cards：experience 前 200vh trigger；桌面 3 列，移动/无 JS 用原列表 */
-.cards-trigger { height: 200vh; position: relative; z-index: var(--z-raised); }
+.cards-trigger { height: 200vh; position: relative; z-index: var(--z-petals); }
 .fixed-cards {
   position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
-  gap: clamp(16px, 2vw, 28px); padding: 0 max(24px, 6vw); z-index: var(--z-fixed-cards);
+  gap: clamp(16px, 2vw, 28px); padding: 0 max(24px, 6vw); z-index: var(--z-cards);
   opacity: 0; pointer-events: none; will-change: opacity;
 }
 .fixed-cards__card {
@@ -1550,7 +1548,7 @@ html.exp-reveal [data-campus],
 html.exp-reveal [data-education] { display: none !important; }
 
 /* M10 花瓣拼合层：视频之上、内容之下；移动/reduced/no-JS 不画 */
-.detail-petals { position: fixed; inset: 0; width: 100%; height: 100%; z-index: var(--z-raised); pointer-events: none; opacity: 0; transition: opacity var(--dur-slow) ease; }
+.detail-petals { position: fixed; inset: 0; width: 100%; height: 100%; z-index: var(--z-petals); pointer-events: none; opacity: 0; transition: opacity var(--dur-slow) ease; }
 html.detail-bg-on .detail-petals { opacity: 1; }
 @media (max-width: 899px), (pointer: coarse), (prefers-reduced-motion: reduce) { .detail-petals { display: none; } }
 /* M10 提亮：详情 video .9 / brightness 1.02；scrim 减弱（正文对比度 ≥4.5） */
@@ -1562,7 +1560,7 @@ html.detail-bg-on .detail-petals { opacity: 1; }
 
 /* M10 花瓣层在内容之下 */
 .content-flow { position: relative; z-index: var(--z-content); }
-.detail-petals { z-index: var(--z-raised); }
+.detail-petals { z-index: var(--z-petals); }
 
 /* M10B 背景中心径向 scrim：遮住视频里原有的花，避免两朵 */
 .detail-bg__scrim { background: radial-gradient(circle at 52.5% 46.7%, color-mix(in srgb, var(--color-scrim-detail) 86%, transparent) 0 22%, color-mix(in srgb, var(--color-scrim-detail) 58%, transparent) 34%, transparent 52%), linear-gradient(180deg, color-mix(in srgb, var(--color-scrim-detail) 48%, transparent), color-mix(in srgb, var(--color-scrim-detail) 40%, transparent) 45%, color-mix(in srgb, var(--color-scrim-detail) 54%, transparent)); }
@@ -1592,7 +1590,7 @@ html.detail-bg-on .detail-petals { opacity: 1; }
   --fs-heading: clamp(20px, 1.8vw, 24px); --fs-body: 16px; --fs-body-sm: 14px; --fs-caption: 12px;
   --space-0: 0; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
   --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-pill: 999px;
-  --z-base: 0; --z-raised: 1; --z-content: 2; --z-particles: 3; --z-fixed-cards: 4; --z-reveal: 5; --z-scrim: 6; --z-lanyard: 7; --z-narrative: 8; --z-frame: 10; --z-nav: 20; --z-skip: 40; --z-banner: 55; --z-prompt: 60; --z-noise: 99;
+  --z-media: 0; --z-petals: 1; --z-content: 2; --z-particles: 3; --z-cards: 4; --z-reveal: 5; --z-scrim: 6; --z-lanyard: 7; --z-narrative: 8; --z-frame: 9; --z-nav: 10; --z-overlay: 500; --z-modal: 1000; --z-toast: 2000;
   /* M11.1d: scrim / overlay / texture / radius tokens (values unchanged; registered in DESIGN §2) */
   --color-black: #000000; --color-white: #ffffff;
   --color-scrim-detail: #050708; --color-scrim-doc: #060708; --color-scrim-video: #080a0c; --color-scrim-panel: #0a0c0e; --color-sheet: #08090a;

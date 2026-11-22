@@ -34,37 +34,20 @@ typography:
 space: { "0": "0", "1": "4px", "2": "8px", "3": "12px", "4": "16px", "5": "24px", "6": "32px", "7": "48px", "8": "64px", "9": "96px" }
 radius: { sm: "8px", md: "12px", lg: "16px", pill: "999px" }
 z-index:
-  base: "0"
-  raised: "1"
+  media: "0"
+  petals: "1"
   content: "2"
   particles: "3"
-  fixed-cards: "4"
+  cards: "4"
   reveal: "5"
   scrim: "6"
   lanyard: "7"
   narrative: "8"
-  frame: "10"
-  nav: "20"
-  skip: "40"
-  modal: "40"
-  modal-panel: "41"
-  banner: "55"
-  prompt: "60"
-  noise: "99"
-overlay:
-  black: "#000000"
-  white: "#ffffff"
-  scrim-detail: "#050708"
-  scrim-doc: "#060708"
-  scrim-video: "#080a0c"
-  scrim-panel: "#0a0c0e"
-  sheet: "#08090a"
-texture:
-  metal-dark: "#202427"
-  metal-mid: "#3a4145"
-  metal-shadow: "#24292c"
-  metal-hi: "#aeb4b7"
-  metal-lo: "#5f666a"
+  frame: "9"
+  nav: "10"
+  overlay: "500"
+  modal: "1000"
+  toast: "2000"
 motion: { fast: "120ms", base: "180ms", slow: "240ms", slower: "320ms", easing: "cubic-bezier(.16,1,.3,1)" }
 breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280px", wide: "1440px" }
 ---
@@ -152,7 +135,10 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 
 - 阴影只用于模态/悬浮：`0 24px 80px rgba(0,0,0,.45)`；静态卡不加大阴影。
 - 玻璃卡阴影：`0 8px 32px rgba(0,0,0,.25)` + hairline 描边。
-- 层级 token（实现值，M11.1d 全量替换，顺序即层序）：`--z-base 0`（视频/背景层）→ `--z-raised 1`（花瓣/静态章节/bloom 底）→ `--z-content 2`（内容流/卡片）→ `--z-particles 3`（粒子/挂绳）→ `--z-fixed-cards 4`（fixed cards/金属扣）→ `--z-reveal 5`（reveal/命中代理）→ `--z-scrim 6` → `--z-lanyard 7` → `--z-narrative 8`（三章固定层）→ `--z-frame 10` → `--z-nav 20`（导航/时钟）→ `--z-skip 40` / `--z-modal 40` / `--z-modal-panel 41` → `--z-banner 55` → `--z-prompt 60` → `--z-noise 99`。
+- **全局档（v5.3）**：`0` 背景 / `10` 导航 / `500` 覆盖·遮罩 / `1000` 模态 / `2000` toast·skip。
+- **detail compositing band 0–9（例外，顺序固定）**：`--z-media 0`（detail-bg/video）→ `--z-petals 1` → `--z-content 2`（content-flow）→ `--z-particles 3` → `--z-cards 4`（fixed-cards）→ `--z-reveal 5` → `--z-scrim 6` → `--z-lanyard 7` → `--z-narrative 8` → `--z-frame 9` → `--z-nav 10`（导航/时钟）；**花瓣永远在内容（文字）下；模态永远在导航上**。
+- **局部 stacking context（用字面值，不映射全局 token）**：Lanyard 内部 card `2` / strap `3` / clip `4` / hit `5`（宿主 `.lanyard-layer` 为 band 7）；ReflectiveCard 内部 `1`/`2`。
+- 旧 `.bloom-act`/`.cards-trigger` 等 z 已并入 band token；`40/41/55/60/99` 等散落值全部删除；遮挡层 `--z-overlay 500`、模态 `--z-modal 1000`、skip/toast `--z-toast 2000`。
 
 ## 6. Shapes · 圆角与描边
 
@@ -161,18 +147,19 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 头像/图标容器用 pill 或 12px；不混用 6px/10px 等非 token 值。
 - **落地（M11.1d）**：`border-radius` 全站（含 islands）只用 `sm/md/lg/pill`；圆形用 `--radius-round: 50%`（CTA/头像点）。
 - 分区线用 1px hairline，不用阴影做分割。
+- **层级约束（v5.3）**：detail compositing band `0–9` 顺序固定（见 §5），新层不得插在 petals 与 content 之间造成翻层；模态永远在导航上。
 
 ## 7. Components · 组件清单（≥10）
 
 1. **TopNav**（`nav`）：玻璃 pill 容器 + 当前项 off-white 实底；`aria-current`；hover 120ms。
-2. **GooeyNav**（React 岛）：canvas 2D 粒子；静态回退为 TopNav；`--z-nav`（20）。
+2. **GooeyNav**（React 岛）：canvas 2D 粒子；静态回退为 TopNav；`--z-nav`（10）。
 3. **Hero**（电影感三章）：视频背景 + 品牌字 + 章节说明；文字必须局部底；hero 视频 brightness 1.18/scrim .78。
 4. **SectionHeader**：mono kicker + section 标题 + hairline 分隔；编号 01–05 用 CSS counter。
 5. **GlassCard**：`surface-2` 半透明 + blur(10px) + hairline；正文必须 ≥4.5:1。
 6. **ExpCard**：公司/日期/角色/要点；桌面 3 列 grid、移动 1 列、`--color-sheet` 90%（color-mix）+ hairline。
 7. **ProjectCard**：静态项目卡 + 技术栈 tag pill + 详情按钮；hover 120ms + translateY(-1px)。
 8. **CircularGallery**：3D 轮播岛；键盘 Enter/Space 开卡；离开视口暂停 autoScroll。
-9. **DetailModal**（ReflectiveCard）：`--z-modal 40` / `--z-modal-panel 41`；遮罩点击/关闭/Esc/返回四路径；关闭恢复 scrollY±2；焦点回 `.circular-gallery`。
+9. **DetailModal**（ReflectiveCard）：遮罩 `--z-overlay`（500）/ 面板 `--z-modal`（1000）；遮罩点击/关闭/Esc/返回四路径；关闭恢复 scrollY±2；焦点回 `.circular-gallery`。
 10. **ContactCard**：邮箱/GitHub 按钮 + 联系说明；按钮 ≥4.5:1；不出现手机号。
 11. **ButtonPrimary**：`primary` 底 + `on-primary` 文字 + pill；hover 亮度 +8%，focus ring 2px。
 12. **Pill/Tag**：mono caption + hairline 描边 + 8px 圆角；可交互时 focus ring。
@@ -219,7 +206,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **M11.1d（B 批次，v5.2 终版规格，2026-11-23）**：7 角色字号（hero-display/display/title/heading/body/body-sm/caption，1440≈118/68/40/24/16/14/12）；颜色/间距/圆角/z-index/motion 全量 token（裸值 0）；灰阶 4 档；技能卡 4/2/1 等高、padding 24；AA 复测通过（1440 正文 p95 ≥6.71、375 ≥5.43；大字 ≥15.57；focus ring 12.2）；**移动视频保留 hero+reveal**：375 首屏 ≤2 条 mp4 合计 ≤7.0MB、无其他 mp4，reduced/无 JS 用 poster；详情区按 M10E 断点。
   - 实测：375 首屏仅 hero 1 条（传输 5.79MB ≤7.0MB），叙事滚动后追加 reveal（累计 2 条 9.12MB）；无其他 mp4；reduced/no-JS 0 条。
 - **M11.1e（7 角色锁定映射收尾，2026-11-23）**：字号与提示词助手锁定表逐项对齐（见 §3）：`--fs-hero-display/display/title/heading/body/body-sm/caption`；118→hero-display、68→display、40/38/34→title、26→title min、24/22→heading；mono 仅字体家族（无第 8 档）。375/1440 computed 去重均 **7**（`[12,14,16,20,26,34,42]` / `[12,14,16,24,40,68,118.08]`），无 <12px，正文 16/1.7。islands（gooey-nav/lanyard/circular-gallery/reflective-card）颜色/圆角/间距已 token 化，仅替换原值（`reflective-card` badge 6px gap 用 calc 精确保留 6px）。
-  - **待裁定**：z-index 统一（0/10/100/500/1000 会翻转花瓣/文字层级；当前实现为等值层序 token，未做五档统一）；非 4 倍数间距（6/10/14/18/20/22/26/28）——当前 v5.2 已按"最近 4 步 token"落值，若裁定要回退原值可回退。
+  - **v5.3 已裁定并落地（M11.1f）**：z-index 按「全局档 0/10/500/1000/2000 + detail compositing band 0–9」重映射（见 §5），Lanyard/ReflectiveCard 内部局部 stacking context 保留字面值；旧 40/41/55/60/99 与 bloom-act 散落值删除。非 4 倍数间距按「最近 4 倍数、半数向上」收敛（6→8/10→12/14→16/18→20/22→24/26→28，20/28 登记 4-grid 例外），详见 §4。
 - **M11.2 P1**：技能 4 卡（已 4/2/1 等高，余：2×2 与 4 列的二选一定稿）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数（已达成）、内容 1200/阅读 720、hover 120ms + -1px、四态。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
 - **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55；**375 首屏 ≤2 条 mp4（hero+reveal）合计 ≤7.0MB、无其他 mp4**；0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；7 角色 token（375/1440 computed 去重 ≤7、无 11px）；技能卡不落单；详情四路径 + 键盘回归；`noindex` 保持。
