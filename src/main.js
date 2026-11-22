@@ -614,7 +614,7 @@ function initFixedCards() {
     const opacity = Math.min(fadeIn, fadeOut);
     layer.style.opacity = String(opacity);
     layer.style.pointerEvents = opacity > 0.1 ? 'auto' : 'none';
-    document.documentElement.classList.toggle('cards-visible', opacity > 0.02);
+    document.documentElement.classList.toggle('cards-visible', opacity > 0.05);
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
   addEventListener('scroll', request, { passive: true });

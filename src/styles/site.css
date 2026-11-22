@@ -1535,3 +1535,6 @@ html.cards-visible .sec3 { display: none !important; }
   .detail-bg__video { display: none !important; }
   .detail-particles { display: none !important; }
 }
+
+/* M9 cards 与列表交接：卡片可见期间列表必须隐藏，避免同屏/跳变 */
+html.cards-visible .exp-list { display: none !important; }
