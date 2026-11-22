@@ -449,183 +449,202 @@ if (content.islands?.lanyard !== false && canUseLanyard) {
     io.observe(el);
   });
 })();
-/* M8.4 详情区 Bloom 背景：进入 #about 前 300px 才加载；离开详情区暂停；移动/coarse/reduced 只用 poster */
-function initDetailBg() {
+/* M9 详情区单一状态源：video 背景 + 粒子；离开即移除 class / pause / cancel rAF，tick 不得回写 */
+function initDetailScene() {
   const layer = $('[data-detail-bg]');
-  const video = $('[data-detail-bg-video]');
-  if (!layer || !video) return;
+  const about = document.getElementById('about');
+  const video = $('[data-detail-video]');
+  const pCanvas = $('[data-detail-particles]');
+  if (!layer || !about || !video) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const coarse = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 899px)').matches;
-  const canVideo = !reduced && !coarse;
-  const sections = ['about', 'experience', 'projects', 'honors', 'contact']
-    .map((id) => document.getElementById(id))
-    .filter(Boolean);
-  let srcSet = false;
-  const loadVideo = () => {
-    if (!canVideo || srcSet) return;
-    srcSet = true;
-    video.src = '/media/detail/bloom-loop.mp4';
-    video.play().catch(() => { /* 自动播放被拒保留 poster */ });
+  const coarse = matchMedia('(pointer: coarse)').matches || innerWidth < 900;
+  let aboutTop = 0;
+  let active = false;
+  let started = false;
+  let videoRaf = 0;
+  let partRaf = 0;
+  let current = 0;
+  let currentParticles = [];
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const pctx = pCanvas ? pCanvas.getContext('2d') : null;
+  const measure = () => { aboutTop = about.getBoundingClientRect().top + scrollY; };
+  const dur = () => (Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 10);
+  const seek = (t) => {
+    if (video.seeking || Math.abs(video.currentTime - t) < 0.08) return;
+    try { if (typeof video.fastSeek === 'function') video.fastSeek(t); else video.currentTime = t; } catch { /* ignore */ }
   };
+  const videoTick = () => {
+    videoRaf = 0;
+    if (!active) return;
+    const p = Math.min(1, Math.max(0, (scrollY - aboutTop) / Math.max(1, document.documentElement.scrollHeight - innerHeight - aboutTop)));
+    const target = p * Math.max(0, dur() - 0.05);
+    current += (target - current) * 0.12;
+    seek(current);
+    videoRaf = requestAnimationFrame(videoTick);
+  };
+  const startVideo = () => { if (!videoRaf) videoRaf = requestAnimationFrame(videoTick); };
+  const stopVideo = () => { if (videoRaf) { cancelAnimationFrame(videoRaf); videoRaf = 0; } video.pause(); };
+  const buildParticles = () => {
+    if (!pCanvas || !pctx) return;
+    pCanvas.width = Math.max(1, Math.round(innerWidth * dpr));
+    pCanvas.height = Math.max(1, Math.round(innerHeight * dpr));
+    const count = Math.max(18, Math.round((innerWidth * innerHeight) / 12000));
+    currentParticles = Array.from({ length: count }, () => ({
+      x: Math.random() * pCanvas.width,
+      y: Math.random() * pCanvas.height,
+      r: (0.5 + Math.random() * 1.5) * dpr,
+      vy: (0.08 + Math.random() * 0.22) * dpr,
+      a: 0.18 + Math.random() * 0.5
+    }));
+    pCanvas.dataset.particles = String(count);
+  };
+  let lastP = 0;
+  const particleTick = (now) => {
+    partRaf = 0;
+    if (!active || !pctx) return;
+    if (now - lastP < 1000 / 30) { partRaf = requestAnimationFrame(particleTick); return; }
+    lastP = now;
+    pctx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    for (const p of currentParticles) {
+      p.y -= p.vy;
+      if (p.y < -4) { p.y = pCanvas.height + 4; p.x = Math.random() * pCanvas.width; }
+      pctx.beginPath();
+      pctx.fillStyle = `rgba(255,255,255,${p.a})`;
+      pctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      pctx.fill();
+    }
+    partRaf = requestAnimationFrame(particleTick);
+  };
+  const startParticles = () => { if (pctx && !partRaf) { lastP = 0; partRaf = requestAnimationFrame(particleTick); } };
+  const stopParticles = () => { if (partRaf) { cancelAnimationFrame(partRaf); partRaf = 0; } if (pctx) pctx.clearRect(0, 0, pCanvas.width, pCanvas.height); };
+  const load = () => {
+    if (started) return;
+    started = true;
+    video.src = '/media/detail/veldara-loop.mp4';
+    video.load();
+    video.addEventListener('loadeddata', () => { layer.classList.add('is-ready'); layer.dataset.duration = dur().toFixed(2); seek(0); }, { once: true });
+    video.addEventListener('error', () => { started = false; layer.dataset.error = 'video-error'; });
+  };
+  const setActive = (on) => {
+    if (on === active) return;
+    active = on;
+    document.documentElement.classList.toggle('detail-bg-on', on);
+    if (on) {
+      if (!started && scrollY + innerHeight >= aboutTop - 600) load();
+      startVideo();
+      startParticles();
+    } else {
+      stopVideo();
+      stopParticles();
+      document.documentElement.classList.remove('detail-bg-on');
+    }
+    layer.dataset.active = on ? '1' : '0';
+  };
+  const onScroll = () => { measure(); setActive(scrollY + innerHeight >= aboutTop); };
+  buildParticles(); measure(); onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', () => { measure(); buildParticles(); onScroll(); });
+  addEventListener('pagehide', () => { stopVideo(); stopParticles(); });
+}
+initDetailScene();
+/* M9 fixed cards：内容来自 site-content.experience，滚动 fadeIn/fadeOut，移动/无 JS 回退原列表 */
+function initFixedCards() {
+  const trigger = $('[data-cards-trigger]');
+  const layer = $('[data-fixed-cards]');
+  if (!trigger || !layer) return;
+  const about = document.querySelector('#about');
+  if (about && trigger && trigger.previousElementSibling !== about) { about.insertAdjacentElement('afterend', trigger); }
+  console.log('cards-order', trigger.offsetTop, about.offsetTop, about.compareDocumentPosition(trigger));
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches || innerWidth < 900;
+  if (reduced || coarse) return;
+  const jobs = content.experience ?? [];
+  for (const job of jobs) {
+    const card = document.createElement('article');
+    card.className = 'fixed-cards__card';
+    const head = document.createElement('div');
+    head.className = 'fixed-cards__head';
+    const h3 = document.createElement('h3');
+    h3.className = 'fixed-cards__company';
+    h3.textContent = job.company ?? '';
+    const period = document.createElement('span');
+    period.className = 'fixed-cards__period';
+    period.textContent = job.period ?? '';
+    head.append(h3, period);
+    const role = document.createElement('p');
+    role.className = 'fixed-cards__role';
+    role.textContent = job.role ?? '';
+    const ul = document.createElement('ul');
+    ul.className = 'fixed-cards__list';
+    for (const line of job.highlights ?? []) {
+      const li = document.createElement('li');
+      li.textContent = line;
+      ul.append(li);
+    }
+    card.append(head, role, ul);
+    layer.append(card);
+  }
+  // 第 3 张：校园 + 教育（数据来自 content.campus / education）
+  const campusJob = { company: '校园与教育', period: content.education?.period ?? '2023—2027', role: [content.education?.school, content.education?.major].filter(Boolean).join(' · '), highlights: (content.campus ?? []).map((item) => [item.title, item.detail].filter(Boolean).join('：')) };
+  if (campusJob.highlights.length) {
+    const card = document.createElement('article');
+    card.className = 'fixed-cards__card';
+    const head = document.createElement('div'); head.className = 'fixed-cards__head';
+    const h3 = document.createElement('h3'); h3.className = 'fixed-cards__company'; h3.textContent = campusJob.company;
+    const period = document.createElement('span'); period.className = 'fixed-cards__period'; period.textContent = campusJob.period;
+    head.append(h3, period);
+    const role = document.createElement('p'); role.className = 'fixed-cards__role'; role.textContent = campusJob.role;
+    const ul = document.createElement('ul'); ul.className = 'fixed-cards__list';
+    for (const line of campusJob.highlights) { const li = document.createElement('li'); li.textContent = line; ul.append(li); }
+    card.append(head, role, ul); layer.append(card);
+  }
+  layer.dataset.count = String(layer.children.length);
+  document.documentElement.classList.add('cards-js');
   let ticking = false;
   const update = () => {
     ticking = false;
-    const on = sections.some((section) => {
-      const rect = section.getBoundingClientRect();
-      return rect.bottom > 0 && rect.top < innerHeight;
-    });
-    document.documentElement.classList.toggle('detail-bg-on', on);
-    if (on) {
-      loadVideo();
-      if (video.paused && srcSet) video.play().catch(() => {});
-    } else if (!video.paused) {
-      video.pause();
-    }
+    const rect = trigger.getBoundingClientRect();
+    const top = rect.top + scrollY;
+    const vh = innerHeight;
+    const start = top - vh * 0.5;
+    const end = top + rect.height - vh * 0.3;
+    const fadeIn = Math.min(1, Math.max(0, (scrollY - (start - vh * 0.2)) / (vh * 0.2)));
+    const fadeOut = Math.min(1, Math.max(0, (end + vh * 0.3 - scrollY) / (vh * 0.3)));
+    const opacity = Math.min(fadeIn, fadeOut);
+    layer.style.opacity = String(opacity);
+    layer.style.pointerEvents = opacity > 0.1 ? 'auto' : 'none';
+    document.documentElement.classList.toggle('cards-visible', opacity > 0.02);
   };
-  const requestUpdate = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(update);
-  };
+  const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', request, { passive: true });
+  addEventListener('resize', request);
   update();
-  addEventListener('scroll', requestUpdate, { passive: true });
-  addEventListener('resize', requestUpdate);
-  // 进入 #about 前 300px 预加载（首屏不请求）
+}
+initFixedCards();
+/* M9 收尾：hero 只淡出 #about；section-three IO 加 visible；只动 opacity/transform */
+function initM9Outro() {
   const about = document.getElementById('about');
-  if (about && canVideo && 'IntersectionObserver' in window) {
-    new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) loadVideo();
-    }, { rootMargin: '300px 0px' }).observe(about);
+  const contact = document.getElementById('contact');
+  if (about) {
+    let ticking = false;
+    const fadeAbout = () => {
+      ticking = false;
+      const top = about.getBoundingClientRect().top + scrollY;
+      const h = Math.max(1, about.offsetHeight);
+      const fade = Math.min(1, Math.max(0, 1 - (scrollY - top) / Math.max(1, h * 0.9)));
+      about.style.opacity = String(fade);
+    };
+    const req = () => { if (!ticking) { ticking = true; requestAnimationFrame(fadeAbout); } };
+    addEventListener('scroll', req, { passive: true });
+    addEventListener('resize', req);
+    fadeAbout();
+  }
+  if (contact && 'IntersectionObserver' in window) {
+    contact.classList.add('sec-io');
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) entry.target.classList.toggle('is-visible', entry.isIntersecting);
+    }, { threshold: 0.15 });
+    io.observe(contact);
   }
 }
-initDetailBg();/* M8.6 Bloom 开场幕：canvas 双缓冲擦洗（lerp 0.08 / safeSeek / 生命周期不黑屏） */
-function initBloomAct() {
-  const section = $('[data-bloom-act]');
-  if (!section) return;
-  const kicker = $('[data-act-kicker]');
-  if (kicker) kicker.textContent = content.act?.kicker ?? '';
-  const items = [...section.querySelectorAll('[data-act-item]')];
-  items.forEach((item, index) => {
-    item.querySelector('.bloom-act__no').textContent = `0${index + 1} / 03`;
-    item.querySelector('p').textContent = content.act?.items?.[index] ?? '';
-  });
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const coarse = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 899px)').matches;
-  if (reduced || coarse) return;
-  const canvas = $('[data-act-canvas]');
-  const ctx = canvas.getContext('2d');
-  const videos = [...section.querySelectorAll('[data-act-video]')];
-  const srcs = ['/media/detail/bloom-loop.mp4', '/media/detail/bloom-act-2.mp4', '/media/detail/bloom-act-3.mp4'];
-  const posters = ['/media/detail/bloom-poster.jpg', '/media/detail/bloom-act-2-poster.jpg', '/media/detail/bloom-act-3-poster.jpg'];
-  const keys = ['v1', 'v2', 'v3'];
-  const images = posters.map((src) => { const img = new Image(); img.src = src; return img; });
-  const seeking = { v1: false, v2: false, v3: false };
-  const pending = { v1: -1, v2: -1, v3: -1 };
-  const loaded = new Set();
-  let offscreen = null;
-  let w = 0; let h = 0; let dpr = 1;
-  let current = 0; let target = 0; let raf = 0;
-  let actStart = 0; let actEnd = 0; let span = 1;
-  const activeKey = (p) => (p <= 1 / 3 ? 'v1' : p <= 2 / 3 ? 'v2' : 'v3');
-  const localOf = (p, key) => {
-    if (key === 'v1') return Math.min(1, Math.max(0, p * 3));
-    if (key === 'v2') return Math.min(1, Math.max(0, (p - 1 / 3) * 3));
-    return Math.min(1, Math.max(0, (p - 2 / 3) * 3));
-  };
-  const resize = () => {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = section.clientWidth;
-    h = innerHeight;
-    canvas.width = Math.max(1, Math.round(w * dpr));
-    canvas.height = Math.max(1, Math.round(h * dpr));
-    if (!offscreen) offscreen = document.createElement('canvas');
-    offscreen.width = canvas.width;
-    offscreen.height = canvas.height;
-    drawFrame();
-  };
-  const drawFrame = () => {
-    if (!ctx || !w || !h) return;
-    const key = activeKey(current);
-    const index = keys.indexOf(key);
-    const video = videos[index];
-    const ready = video && video.readyState >= 2;
-    const source = ready ? video : images[index];
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const oc = offscreen.getContext('2d');
-    oc.setTransform(1, 0, 0, 1, 0, 0);
-    oc.clearRect(0, 0, offscreen.width, offscreen.height);
-    const sw = ready ? video.videoWidth : images[index].naturalWidth || 1280;
-    const sh = ready ? video.videoHeight : images[index].naturalHeight || 720;
-    if (!sw || !sh) return;
-    const scale = Math.max(canvas.width / sw, canvas.height / sh);
-    const dw = sw * scale; const dh = sh * scale;
-    const ox = (canvas.width - dw) / 2; const oy = (canvas.height - dh) / 2;
-    try { oc.drawImage(source, ox, oy, dw, dh); } catch { return; }
-    ctx.drawImage(offscreen, 0, 0);
-  };
-  const ensure = (index) => {
-    if (loaded.has(index)) return;
-    loaded.add(index);
-    const video = videos[index];
-    video.src = srcs[index];
-    video.preload = 'auto';
-    video.load();
-    video.addEventListener('loadedmetadata', () => { if (keys[index] === activeKey(current)) { safeSeek(keys[index], localOf(current, keys[index]) * 8); drawFrame(); } }, { once: true });
-    video.addEventListener('seeked', () => {
-      const key = keys[index];
-      seeking[key] = false;
-      if (key === activeKey(current)) drawFrame();
-      if (pending[key] >= 0) { const t = pending[key]; pending[key] = -1; safeSeek(key, t); }
-    });
-  };
-  const safeSeek = (key, time) => {
-    const index = keys.indexOf(key);
-    ensure(index);
-    const video = videos[index];
-    const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 8;
-    const clamped = Math.min(1, Math.max(0, time / duration)) * duration;
-    if (Math.abs(video.currentTime - clamped) < 0.01) { drawFrame(); return; }
-    if (seeking[key]) { pending[key] = clamped; return; }
-    seeking[key] = true; pending[key] = -1;
-    try { if (typeof video.fastSeek === 'function') video.fastSeek(clamped); else video.currentTime = clamped; } catch { seeking[key] = false; }
-  };
-  const tick = () => {
-    raf = 0;
-    current += (target - current) * 0.08;
-    const inAct = scrollY + innerHeight >= actStart && scrollY <= actEnd + innerHeight;
-    document.documentElement.classList.toggle('act-mode', inAct);
-    const p = Math.min(1, Math.max(0, current));
-    const key = activeKey(p);
-    const index = keys.indexOf(key);
-    safeSeek(key, localOf(p, key) * 8);
-    drawFrame();
-    videos.forEach((video, i) => { if (i !== index) video.pause(); });
-    items.forEach((item, i) => item.classList.toggle('is-active', i === index));
-    const nearEnd = scrollY > actStart - innerHeight - 600;
-    if (nearEnd && scrollY < actEnd + innerHeight) raf = requestAnimationFrame(tick);
-    else {
-      videos.forEach((video) => video.pause());
-    }
-  };
-  const measure = () => {
-    actStart = section.offsetTop;
-    actEnd = actStart + section.offsetHeight;
-    span = Math.max(1, section.offsetHeight - innerHeight);
-  };
-  const onScroll = () => {
-    const p = Math.min(1, Math.max(0, (scrollY - actStart) / span));
-    target = p;
-    const inAct = scrollY + innerHeight >= actStart && scrollY <= actEnd + innerHeight;
-    document.documentElement.classList.toggle('act-mode', inAct);
-    // 阶段前 0.15 预载下一段（不靠 safeSeek 才加载）
-    if (p >= 1 / 3 - 0.15) ensure(1);
-    if (p >= 2 / 3 - 0.15) ensure(2);
-    if (!raf && scrollY > actStart - innerHeight - 600 && scrollY < actEnd + innerHeight) raf = requestAnimationFrame(tick);
-  };
-  measure(); resize();
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { measure(); resize(); });
-  onScroll();
-}
-initBloomAct();
+initM9Outro();

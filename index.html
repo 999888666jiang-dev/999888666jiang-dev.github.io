@@ -105,45 +105,9 @@
   <div class="runway-2" data-runway="2" aria-hidden="true"></div>
   <div class="runway-3" data-runway="3" aria-hidden="true"></div>
 
-  <!-- M8.5/M8.6 Bloom 开场幕：500vh sticky + canvas 双缓冲擦洗（视频 0×0 隐藏；移动/reduced 三屏 poster） -->
-  <section class="bloom-act" id="act" data-bloom-act aria-label="Bloom 开场">
-    <div class="bloom-act__stage">
-      <canvas class="bloom-act__canvas" data-act-canvas aria-hidden="true"></canvas>
-      <video class="bloom-act__source" data-act-video="0" muted playsinline preload="none" poster="/media/detail/bloom-poster.jpg" aria-hidden="true"></video>
-      <video class="bloom-act__source" data-act-video="1" muted playsinline preload="none" poster="/media/detail/bloom-act-2-poster.jpg" aria-hidden="true"></video>
-      <video class="bloom-act__source" data-act-video="2" muted playsinline preload="none" poster="/media/detail/bloom-act-3-poster.jpg" aria-hidden="true"></video>
-      <div class="bloom-act__fallback" aria-hidden="true">
-        <div class="bloom-act__screen" style="background-image:url('/media/detail/bloom-poster.jpg')"></div>
-        <div class="bloom-act__screen" style="background-image:url('/media/detail/bloom-act-2-poster.jpg')"></div>
-        <div class="bloom-act__screen" style="background-image:url('/media/detail/bloom-act-3-poster.jpg')"></div>
-      </div>
-      <div class="bloom-act__scrim" aria-hidden="true"></div>
-      <div class="bloom-act__copy">
-        <p class="bloom-act__kicker" data-act-kicker></p>
-        <ol class="bloom-act__items">
-          <li class="bloom-act__item" data-act-item="0"><span class="bloom-act__no"></span><p></p></li>
-          <li class="bloom-act__item" data-act-item="1"><span class="bloom-act__no"></span><p></p></li>
-          <li class="bloom-act__item" data-act-item="2"><span class="bloom-act__no"></span><p></p></li>
-        </ol>
-      </div>
-    </div>
-  </section>
-  <noscript><style>
-    .bloom-act { height: auto !important; }
-    .bloom-act__stage { position: static !important; height: auto !important; overflow: visible !important; }
-    .bloom-act__canvas, .bloom-act__source { display: none !important; }
-    .bloom-act__fallback { display: grid !important; }
-    .bloom-act__screen { height: 100vh; background-size: cover; background-position: center; }
-    .bloom-act__copy { position: static !important; padding: 48px 6vw; }
-    .bloom-act__items { position: static !important; display: grid !important; gap: 24px; min-height: 0; }
-    .bloom-act__item { position: static !important; opacity: 1 !important; transform: none !important; }
-  </style></noscript>
-  <!-- M8.4 详情区 Bloom 背景层（仅内容区可见；hero 三章不出现） -->
-  <div class="detail-bg" data-detail-bg aria-hidden="true">
-    <video class="detail-bg__video" data-detail-bg-video aria-hidden="true" muted loop playsinline preload="none" poster="/media/detail/bloom-poster.jpg"></video>
-    <div class="detail-bg__scrim" aria-hidden="true"></div>
-  </div>
-  <noscript><style>.detail-bg { opacity: 1 !important; }</style></noscript>
+  <!-- M9 过渡态：详情区 poster 静态背景（无 video；帧序列引擎待建） -->
+  <canvas class="detail-particles" data-detail-particles aria-hidden="true"></canvas>
+  <div class="detail-bg" data-detail-bg aria-hidden="true">`n    <video class="detail-bg__video" data-detail-video muted playsinline preload="metadata" poster="/media/detail/veldara-poster.jpg" aria-hidden="true"></video>`n    <div class="detail-bg__poster" data-detail-poster></div>`n    <div class="detail-bg__scrim"></div>`n  </div>
   <!-- M6.1 / X-05：电影感三章之后的正常文档流内容区（区块独立、数据驱动） -->
   <div class="content-flow" data-content-flow>
     <section class="doc-section" id="about" aria-labelledby="about-title">
@@ -158,7 +122,10 @@
       </noscript>
     </section>
 
-    <section class="doc-section" id="experience" aria-labelledby="experience-title">
+    <div class="cards-trigger" data-cards-trigger>
+    <div class="fixed-cards" data-fixed-cards aria-hidden="true"></div>
+  </div>
+  <section class="doc-section" id="experience" aria-labelledby="experience-title">
       <p class="doc-kicker">EXPERIENCE</p>
       <h2 class="doc-title" id="experience-title">经历</h2>
       <div class="exp-list" data-experience></div>
