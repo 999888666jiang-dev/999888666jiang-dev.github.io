@@ -65,7 +65,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **字体**：不新增外部字体/CDN；自托管 Instrument Serif + Inter，中文回退 Noto Serif SC / PingFang SC / 微软雅黑；中文标题不做负字距，全大写拉丁 +0.08em。
 - **可读性优先**：正文 ≥4.5:1、大字/UI ≥3:1、focus ring ≥3:1，按最亮帧实测；不达标先加局部卡底/局部 scrim，不整页压暗。
 - **动效**：只动 `opacity`/`transform`；reduced-motion 全静态；单主 rAF，30fps 节流；离屏 cancel。
-- **边界**：不改轮播/详情/Lanyard/滚动叙事/粒子/花瓣交互；**移动视频保留 hero+reveal，不 poster-only、不压缩**；375 首屏 ≤2 条 mp4（hero+reveal）合计 ≤7.0MB、无其他 mp4，reduced/无 JS 用 poster；详情区背景仍按 M10E 断点（≤600 poster / 601–899 lite / ≥900 full），不混主页预算；FPS≥55、CLS≤0.1；`noindex` 保持到用户确认发布。
+- **边界**：不改轮播/详情/Lanyard/滚动叙事/粒子/花瓣交互；**移动视频保留 hero+reveal，不 poster-only、不压缩**；首屏（载入到 window.load 且未滚动）仅 hero.mp4 一条、实际传输 ≤7.0MB（文件 6.85MB 仅登记）；reveal.mp4 不属首屏（滚到 reveal 前才请求、单文件 ≤4.0MB）；hero+reveal 两文件合计 ≤11.0MB（仅登记）；无其他首屏 mp4；reduced/无 JS 用 poster；详情区背景仍按 M10E 断点（≤600 poster / 601–899 lite / ≥900 full），不混主页预算；FPS≥55、CLS≤0.1；`noindex` 保持到用户确认发布。
 
 ## 2. Colors · 颜色
 
@@ -204,10 +204,10 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - **M11.1 P0**：字号收敛 7 级（正文 16/1.7、无 <12px、中文无负字距、system-ui）、`:focus-visible` 2px+offset2、颜色/间距/圆角/z-index 走 token、灰阶收敛 4 档、文字列局部底 AA；清理 `index.html` 字面量 `\n`；OG/canonical 改 `https://yunyanfpv.cn/`。
   - **进度（2026-11-23，M11.1c）**：site.css 颜色/间距/圆角 token 化（98/54/27 处）；灰阶收敛 4 档；字号下限 12px、正文 16/1.7、中文 tracking ≥ -0.01em；`:focus-visible` 2px+2px；AA 复测 p95：正文 ≥6.74、大字 ≥5.93（品牌字 p95）、hero caption 4.28→5.39（局部暗光晕，不改布局/不整页压暗）、focus ring 11.76；技能 4 卡 4/2/1 列等高；`index.html` 字面量 `\n` 清理、canonical/og 统一 yunyanfpv.cn（含运行时 `site-content.js`，修 main.js 覆盖回 github.io）；修复 `lastFlight` 未声明导致 strict-mode ReferenceError（M10 遗留）。
   - **已解决（M11.1e/M11.1f）**：字号 7 档（computed 去重 7）；islands CSS 全量 token；z-index v5.3 裁定落地（§5）；非 4 倍数间距 v5.3 收敛（§4）。残留：轮播运行时内联字号与 Lanyard/Reflective 局部 stacking context 按边界保留。
-- **M11.1d（B 批次，v5.2 终版规格，2026-11-23）**：7 角色字号（hero-display/display/title/heading/body/body-sm/caption，1440≈118/68/40/24/16/14/12）；颜色/间距/圆角/z-index/motion 全量 token（裸值 0）；灰阶 4 档；技能卡 4/2/1 等高、padding 24；AA 复测通过（1440 正文 p95 ≥6.71、375 ≥5.43；大字 ≥15.57；focus ring 12.2）；**移动视频保留 hero+reveal**：375 首屏 ≤2 条 mp4 合计 ≤7.0MB、无其他 mp4，reduced/无 JS 用 poster；详情区按 M10E 断点。
-  - 实测：375 首屏仅 hero 1 条（传输 5.79MB ≤7.0MB），叙事滚动后追加 reveal（累计 2 条 9.12MB）；无其他 mp4；reduced/no-JS 0 条。
+- **M11.1d（B 批次，v5.2 终版规格，2026-11-23）**：7 角色字号（hero-display/display/title/heading/body/body-sm/caption，1440≈118/68/40/24/16/14/12）；颜色/间距/圆角/z-index/motion 全量 token（裸值 0）；灰阶 4 档；技能卡 4/2/1 等高、padding 24；AA 复测通过（1440 正文 p95 ≥6.71、375 ≥5.43；大字 ≥15.57；focus ring 12.2）；**移动视频保留 hero+reveal（v5.4 口径）**：首屏仅 hero.mp4 一条、传输 ≤7.0MB；reveal.mp4 非首屏、单文件 ≤4.0MB；两文件合计 ≤11.0MB（登记）；reduced/无 JS 用 poster；详情区按 M10E 断点。
+  - 实测（v5.4，375 冷启动不滚动）：首屏仅 hero.mp4 一条（load 前已传 0.5MB、完整传输 6.85MB，≤7.0MB；文件 6.85MB 登记）；reveal.mp4 于滚动至 1400px（reveal 段）才请求（传输 3.34MB，≤4.0MB）；两文件合计 10.19MB（≤11.0MB，仅登记）；无其他首屏 mp4；reduced/no-JS 0 条 mp4（poster）。
 - **M11.1e（7 角色锁定映射收尾，2026-11-23）**：字号与提示词助手锁定表逐项对齐（见 §3）：`--fs-hero-display/display/title/heading/body/body-sm/caption`；118→hero-display、68→display、40/38/34→title、26→title min、24/22→heading；mono 仅字体家族（无第 8 档）。375/1440 computed 去重均 **7**（`[12,14,16,20,26,34,42]` / `[12,14,16,24,40,68,118.08]`），无 <12px，正文 16/1.7。islands（gooey-nav/lanyard/circular-gallery/reflective-card）颜色/圆角/间距已 token 化，仅替换原值（`reflective-card` badge 6px gap 用 calc 精确保留 6px）。
   - **v5.3 已裁定并落地（M11.1f）**：z-index 按「全局档 0/10/500/1000/2000 + detail compositing band 0–9」重映射（见 §5），Lanyard/ReflectiveCard 内部局部 stacking context 保留字面值；旧 40/41/55/60/99 与 bloom-act 散落值删除。非 4 倍数间距按「最近 4 倍数、半数向上」收敛（6→8/10→12/14→16/18→20/22→24/26→28，20/28 登记 4-grid 例外），详见 §4。
 - **M11.2 P1（已落地）**：experience/honors 各统一为一种卡片组件（experience 3 卡单组件、honors 荣誉+证书同一列表 7 卡）；内容 1200/阅读 720；卡 padding 24/圆角 12（pill 除外）/tag pill；hover 120ms + `translateY(-1px)`、active、focus-visible、disabled 四态；触控目标 移动 ≥44px / 桌面 ≥32px；chapter 节奏 `--section-gap` token 化。未动轮播/详情卡/Lanyard/滚动叙事/粒子/花瓣。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
-- **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55；**375 首屏 ≤2 条 mp4（hero+reveal）合计 ≤7.0MB、无其他 mp4**；0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；7 角色 token（375/1440 computed 去重 ≤7、无 11px）；技能卡不落单；详情四路径 + 键盘回归；`noindex` 保持。
+- **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55；**首屏仅 hero.mp4 一条、实际传输 ≤7.0MB；reveal 非首屏、单文件 ≤4.0MB；两文件合计 ≤11.0MB（登记）；无其他首屏 mp4**；0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；7 角色 token（375/1440 computed 去重 ≤7、无 11px）；技能卡不落单；详情四路径 + 键盘回归；`noindex` 保持。
