@@ -10,7 +10,7 @@ export const siteContent = {
     title: '姜睿 · 大模型应用开发 / Agent 工作流',
     description: '姜睿（JIANG RUI）· 软件工程 2027 届 · 深圳。约 1.5 年 Coze / Dify 实践：智能体与工作流、Prompt 调试、效果验证；方向大模型应用开发 / Agent 工作流。',
     themeColor: '#0a0b0c',
-    ogImage: 'https://999888666jiang-dev.github.io/media/poster.jpg',
+    ogImage: 'https://yunyanfpv.cn/media/poster.jpg',
     robots: 'noindex,nofollow'
   },
 

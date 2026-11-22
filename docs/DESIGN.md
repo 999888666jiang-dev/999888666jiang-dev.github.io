@@ -1,6 +1,6 @@
 ---
 version: "1.0"
-status: "draft-m11.1"
+status: "m11.1c"
 updated: "2026-11-23"
 owner: "姜睿 / yunyanfpv.cn"
 principle: "深色产品 + 电影感 signature；单 UI 强调色；不新增字体/依赖"
@@ -78,6 +78,8 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 卡片底用 `surface-1/2` 或 `rgba(5,7,8,.55)` 局部底；禁止在黑底上直接放 14px 以下灰字。
 - 局部底：文字列/卡加横向渐变到透明的 scrim（`rgba(5,7,8,.55)` 起，不足调 `.58/.62`）。
 - 玻璃卡：`backdrop-filter: blur(10px)` + `surface-2` 半透明；正文不依赖玻璃对比度，必须有实底。
+- **落地（M11.1c）**：`site.css` 已完成 token 化——颜色 98 处、间距 54 处、圆角 27 处改用 token；灰阶收敛为 `canvas / surface-1..3 / ink / muted / subtle` 六档（正文只用 ink/muted/subtle）。
+- **保留的原生值（非散落色）**：M10D 局部底与视频遮罩 `rgba(5,7,8,.x)`（规格裁定值）、交互态描边 `rgba(255,255,255,.2–.4)`、Lanyard 金属扣渐变 5 个灰值（组件视觉不动）。
 
 **验收**：正文 ≥4.5:1、大字/UI ≥3:1、focus ring ≥3:1；最亮帧采样（详情 p=0–.25、首页 hero 首帧）。
 
@@ -99,6 +101,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 中文标题不做负字距（`-0.01em` 只给拉丁 hero-display）；
 - 字体栈加 `system-ui` 兜底；不新增字体文件/依赖。
 - 大字数重量：标题 400（Instrument Serif）/500（Inter），正文 400；不合成粗体。
+- **落地（M11.1c）**：字号下限 12px、正文 16/1.7、中文标题 tracking ≥ -0.01em 已全站实测；computed 档数仍 9–10（见 §10 残留）。
 
 ## 4. Layout · 布局与间距
 
@@ -106,6 +109,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 间距只取 4 的倍数：`0/4/8/12/16/24/32/48/64/96`（token `space.0–9`）。
 - 章节结构：kicker（mono）→ 标题（section）→ 内容；章节间距 ≥64px。
 - 卡片网格：桌面 3 列（≥1200 允许 4 列/2×2 视内容），768 2×2，移动 1 列；**等高**。
+- 技能卡（M11.1c）：≥1200 **4 列**、641–1199 2 列、≤640 1 列；`grid-auto-rows:1fr` 保证等高，1440 不再 3+1 落单。
 - 固定/粘性层不占内容高度；`position:fixed` 层必须 `pointer-events:none`（交互层单独设）。
 - 详情页背景层不参与布局；花瓣/粒子层永远在文字之下（z 见第 6 章）。
 
@@ -114,6 +118,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 阴影只用于模态/悬浮：`0 24px 80px rgba(0,0,0,.45)`；静态卡不加大阴影。
 - 玻璃卡阴影：`0 8px 32px rgba(0,0,0,.25)` + hairline 描边。
 - 层级（token `z-index`）：背景 0 → 内容 10 → 覆盖/花瓣/粒子 100 → 模态 500 → 导航 1000。
+- **已知冲突（M11.1c 未机械替换）**：上一行的 0/10/100/500/1000 与本文件 §5 的层序（花瓣 z1、内容 z2、粒子 z3、fixed cards z4…导航更高）不一致；直接替换会翻转花瓣/文字层级，需设计裁定后再统一。
 - 花瓣 z1、内容 z2、粒子 z3、fixed cards z4、导航更高（与 M9/M10 实现一致）。
 
 ## 6. Shapes · 圆角与描边
@@ -121,6 +126,7 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 - 圆角：`8px`（小控件/标签）、`12px`（卡片）、`16px`（大卡/模态）、`pill`（按钮/标签）。
 - 描边：1px `hairline`；focus 可见时 2px `ink` 环 + 2px offset（见 Components）。
 - 头像/图标容器用 pill 或 12px；不混用 6px/10px 等非 token 值。
+- **落地（M11.1c）**：`border-radius` 27 处已换 token（6/10/14/18px → sm/md/lg）；50% 圆形（头像点）保留。
 - 分区线用 1px hairline，不用阴影做分割。
 
 ## 7. Components · 组件清单（≥10）
@@ -175,8 +181,8 @@ breakpoints: { mobile: "375px", tablet: "768px", narrow: "899px", desktop: "1280
 
 - **M11.0（本文档）**：只出 DESIGN.md，不改样式。验收：YAML 可解析、8 章齐、token 表完整、components ≥10、无散落裸色值（颜色集中在 Colors 章）。
 - **M11.1 P0**：字号收敛 7 级（正文 16/1.7、无 <12px、中文无负字距、system-ui）、`:focus-visible` 2px+offset2、颜色/间距/圆角/z-index 走 token、灰阶收敛 4 档、文字列局部底 AA；清理 `index.html` 字面量 `\n`；OG/canonical 改 `https://yunyanfpv.cn/`。
-  - **进度（2026-11-23）**：token 已入 `site.css :root`；正文 16/1.7、全站无 <12px、中文标题 tracking ≥ -0.01em、`:focus-visible` 2px+2px、OG/canonical 已改；实测见 `docs/verification.md` §8.24。
-  - **残留（转 M11.2/P2）**：计算字号仍有 9–10 档（clamp 未收成 7 级）、CSS 裸色值/间距/圆角未全量走 token、灰阶 4 档未落。
+  - **进度（2026-11-23，M11.1c）**：site.css 颜色/间距/圆角 token 化（98/54/27 处）；灰阶收敛 4 档；字号下限 12px、正文 16/1.7、中文 tracking ≥ -0.01em；`:focus-visible` 2px+2px；AA 复测 p95：正文 ≥6.74、大字 ≥5.93（品牌字 p95）、hero caption 4.28→5.39（局部暗光晕，不改布局/不整页压暗）、focus ring 11.76；技能 4 卡 4/2/1 列等高；`index.html` 字面量 `\n` 清理、canonical/og 统一 yunyanfpv.cn（含运行时 `site-content.js`，修 main.js 覆盖回 github.io）；修复 `lastFlight` 未声明导致 strict-mode ReferenceError（M10 遗留）。
+  - **残留（转 M11.2/P2）**：字号 computed 仍有 9–10 档；islands CSS 未 token 化；M10D scrim/交互态描边按裁定保留（§2）；z-index 规格冲突（§5，需裁定）；非 4 倍数间距（6/10/14/18/20/22/26/28px）未收敛。
 - **M11.2 P1**：技能 4 卡（≥1200 4 列或 2×2、768 2×2、移动 1 列、等高）、experience/honors 统一组件、卡 padding 24/圆角 12/tag pill、间距 4 倍数、内容 1200/阅读 720、hover 120ms + -1px、四态。
 - **M11.3 P2**：动效 token 分档、z-index/阴影收敛、图标 16/20/24、数字 tabular、375/768/1280 + 200% 缩放、死 token 清零、渐变/噪点限量。
 - **每轮验收**：build + 404；四视口截图（无溢出/截断）；CLS≤0.1、FPS≥55、首屏 0 mp4、0 外部请求、0 console error；AA 数值（正文≥4.5、大字/UI≥3、focus ring≥3）；详情四路径 + 键盘回归；`noindex` 保持。

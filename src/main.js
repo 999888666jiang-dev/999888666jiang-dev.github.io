@@ -672,6 +672,7 @@ function initDetailPetals() {
   let assembled = null;
   let flightBuf = null;
   let lastQ = -1;
+  let lastFlight = 0;
   const buildAssembled = () => {
     assembled = document.createElement('canvas');
     assembled.width = CROP.w; assembled.height = CROP.h;
